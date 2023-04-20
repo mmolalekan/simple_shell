@@ -10,6 +10,7 @@
 extern char **environ;
 
 /*CORE*/
+int execute(const char *pathname, char *const argv[], char *const env[]);
 
 /*UTILS*/
 int _putchar(char c);
@@ -20,5 +21,7 @@ char *_strcat(char *dest, char *src);
 int _atoi(char *s);
 
 /*MISCELLANEOUS*/
+char **cpy_env(char **list);
+char **tokenize(char **lineptr);
 
 #endif
