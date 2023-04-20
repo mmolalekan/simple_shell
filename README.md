@@ -2,8 +2,8 @@
 
 ## Authors
 
-   - Abdulmuhaymin Olalekan [Mmoolalekan] (https://github.com/mmolalekan)
-   - Emmanuel Ifeanyichukwu (Mire) Amah [Mire-web] (https://github.com/mire-web)
+   - Abdulmuhaymin Olalekan [Mmoolalekan](https://github.com/mmolalekan)
+   - Emmanuel Ifeanyichukwu (Mire) Amah [Mire-web](https://github.com/mire-web)
 
 ## Technology
 
@@ -12,7 +12,7 @@
 ## Usage
 
 Does not cover every edge case, but can perform basic shell operations
-`./hsh arguments...`
+> `./hsh arguments...`
 
 ## Description
 **This is final project for the first trimester of the Alx Software Engineering program**
