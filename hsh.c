@@ -38,7 +38,15 @@ int main(int ac, char **av, char **env)
 			if (buffer[i] == '\n')
 				buffer[i] = '\0';
 		}
-		argv[0] = buffer;
+		
+		i = 0;
+		
+		argv[i] = strtok(buffer, " ");
+		while (argv[i] != NULL)
+		{
+			i++;
+			argv[i] = strtok(NULL, " ");
+		}
 		execute(buffer, argv, env);
 	}
 	return (0);
