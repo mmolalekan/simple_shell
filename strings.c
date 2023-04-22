@@ -84,3 +84,79 @@ count++;
 }
 return (0);
 }
+
+
+/**
+ * _strdup - duplicate to new memory space location
+ * @str: char
+ * Return: 0
+ */
+char *_strdup(char *str)
+{
+	char *aaa;
+	int i, r = 0;
+
+	if (str == NULL)
+		return (NULL);
+	i = 0;
+	while (str[i] != '\0')
+		i++;
+
+	aaa = malloc(sizeof(char) * (i + 1));
+
+	if (aaa == NULL)
+		return (NULL);
+
+	for (r = 0; str[r]; r++)
+		aaa[r] = str[r];
+
+	return (aaa);
+}
+
+#include "shell.h"
+
+/**
+ * _strchr - finds a character in a string
+ * @s: input
+ * @c: input
+ * Return: Always 0 (Success)
+ */
+char *_strchr(char *s, char c)
+{
+	int i = 0;
+
+	for (; s[i] >= '\0'; i++)
+	{
+		if (s[i] == c)
+			return (&s[i]);
+	}
+	return (0);
+}
+
+
+/**
+ * _strstr - Entry point
+ * @haystack: input
+ * @needle: input
+ * Return: Always 0 (Success)
+ */
+char *_strstr(char *haystack, char *needle)
+{
+	for (; *haystack != '\0'; haystack++)
+	{
+		char *l = haystack;
+		char *p = needle;
+
+		while (*l == *p && *p != '\0')
+		{
+			l++;
+			p++;
+		}
+
+		if (*p == '\0')
+			return (haystack);
+	}
+
+	return (0);
+}
+
