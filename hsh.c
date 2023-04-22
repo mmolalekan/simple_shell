@@ -30,7 +30,7 @@ int main(int ac, char **av, char **env)
 		{
 			write(2, buffer, nread);
 			perror("");
-			break;
+			exit(98);
 		}
 
 		for (i = 0; i < nread; i++)
