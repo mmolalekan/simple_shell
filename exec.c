@@ -69,6 +69,8 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	pid_t pid;
 	int n;
 
+	if ((argv[0][0] == '/') == 1)
+	{
 	pid = fork();
 	if (pid == 0)
 	{
@@ -85,6 +87,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	{
 		perror("process");
 		return (-1);
+	}
 	}
 	return (0);
 }
