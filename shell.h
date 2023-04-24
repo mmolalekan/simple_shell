@@ -13,23 +13,24 @@
 extern char **environ;
 
 /*CORE*/
-int execute(char *command, char *argv[], char *env[]);
+int execute(const char *pathname, char *const argv[], char *const env[]);
 
 /* UTILS */
 int _putchar(char c);
-int _strlen(char *s);
+int _strlen(char const *s);
 char *_strcpy(char *dest, char *src);
 int _strcmp(char *s1, char *s2);
-char *_strcat(char *dest, char *src);
+char *_strcat(char *dest, char const *src);
 int _atoi(char *s);
 char *_strdup(char *str);
 char *_getenv(const char *name);
 char *_strchr(char *s, char c);
 char *_strstr(char *haystack, char *needle);
+int _strncmp(const char *s1, const char *s2, size_t n);
 
 
 /* MISCELLANEOUS */
-char **cpy_env(char **list);
-char **tokenize(char **lineptr);
+char **tokenize(char *lineptr, char *delim);
+char *search_path(char const *str);
 
 #endif

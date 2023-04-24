@@ -7,7 +7,7 @@
  * Return: char
  */
 
-char *_strcat(char *dest, char *src)
+char *_strcat(char *dest, char const *src)
 {
 int DESTINATION_LENGTH = 0;
 char *tmp_dest = dest;
@@ -33,7 +33,7 @@ return (tmp_dest);
  * Return: int
  */
 
-int _strlen(char *s)
+int _strlen(char const *s)
 {
 int i = 0;
 while (*(s + i) != '\0')
@@ -111,52 +111,5 @@ char *_strdup(char *str)
 		aaa[r] = str[r];
 
 	return (aaa);
-}
-
-#include "shell.h"
-
-/**
- * _strchr - finds a character in a string
- * @s: input
- * @c: input
- * Return: Always 0 (Success)
- */
-char *_strchr(char *s, char c)
-{
-	int i = 0;
-
-	for (; s[i] >= '\0'; i++)
-	{
-		if (s[i] == c)
-			return (&s[i]);
-	}
-	return (0);
-}
-
-
-/**
- * _strstr - Entry point
- * @haystack: input
- * @needle: input
- * Return: Always 0 (Success)
- */
-char *_strstr(char *haystack, char *needle)
-{
-	for (; *haystack != '\0'; haystack++)
-	{
-		char *l = haystack;
-		char *p = needle;
-
-		while (*l == *p && *p != '\0')
-		{
-			l++;
-			p++;
-		}
-
-		if (*p == '\0')
-			return (haystack);
-	}
-
-	return (0);
 }
 
