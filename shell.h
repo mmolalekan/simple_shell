@@ -32,5 +32,6 @@ int _strncmp(const char *s1, const char *s2, size_t n);
 /* MISCELLANEOUS */
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
+void handle_relative_path(char *const argv[], char *const env[]);
 
 #endif
