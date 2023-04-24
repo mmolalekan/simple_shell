@@ -7,6 +7,7 @@
  * tokenize - Make command line arguments into tokens
  *
  * @lineptr: String to tokenize
+ * @delim: Delimiter
  * Return: pointer to tokenized array
  */
 
