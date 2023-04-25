@@ -49,6 +49,8 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	pid_t pid;
 	int n;
 
+	if (_strcmp(argv[0], "exit") == 0)
+	exit(EXIT_SUCCESS);
 	if ((argv[0][0] == '/') == 1 || argv[0][0] == '.')
 	{
 		pid = fork();
