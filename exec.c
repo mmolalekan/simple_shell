@@ -48,15 +48,17 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 {
 	pid_t pid;
 	int n;
+	size_t command_count = 0;
 
 	if (_strcmp(argv[0], "exit") == 0)
 	exit(EXIT_SUCCESS);
 	if ((argv[0][0] == '/') == 1 || argv[0][0] == '.')
 	{
+		command_count++;
 		pid = fork();
 		if (pid == 0)
 		{
-			if (execve(pathname, argv, env) == -1)
+			if (execve(argv[0], argv, env) == -1)
 			{
 				perror("Execution");
 			}
@@ -68,13 +70,14 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 		}
 		else
 		{
+			command_count++;
 			perror("process");
 			return (-1);
 		}
 	}
 	else
 	{
-		handle_relative_path(argv, env);
+		handle_relative_path(pathname, argv, env);
 	}
 	return (0);
 }
@@ -86,7 +89,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
  * @env: enviroment variables
  */
 
-void handle_relative_path(char *const argv[], char *const env[])
+void handle_relative_path(const char *pathname, char *const argv[], char *const env[])
 {
 	char *filepath;
 	int i;
@@ -109,6 +112,8 @@ void handle_relative_path(char *const argv[], char *const env[])
 	}
 	else
 	{
+		write(STDERR_FILENO, pathname, _strlen(pathname));
+		write(STDERR_FILENO, ": ", 2);
 		write(STDERR_FILENO, argv[0], _strlen(argv[0]));
 		write(STDERR_FILENO, ": not found", 12);
 		_putchar('\n');
