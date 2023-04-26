@@ -45,7 +45,8 @@ int main(int ac, char **av, char **env)
 			i++;
 			argv[i] = strtok(NULL, " ");
 		}
-		execute(argv[0], argv, env);
+		execute(av[0], argv, env);
 	}
+	free(buffer);
 	return (0);
 }

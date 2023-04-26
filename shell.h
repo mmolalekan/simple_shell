@@ -32,7 +32,11 @@ char *_memcpy(char *dest, char *src, unsigned int n);
 /* MISCELLANEOUS */
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
+<<<<<<< HEAD
 void handle_relative_path(char *const argv[], char *const env[]);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
+=======
+void handle_relative_path(const char *pathname, char *const argv[], char *const env[]);
+>>>>>>> 465bdfc0408af89f605f8ecbfd6ff96e2456f588
 
 #endif
