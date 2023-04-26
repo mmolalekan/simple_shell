@@ -29,6 +29,7 @@ int main(int ac, char **av, char **env)
 		{
 			write(2, buffer, nread);
 			perror("");
+			free(buffer);
 			exit(98);
 		}
 		if (buffer[0] == '\n')
