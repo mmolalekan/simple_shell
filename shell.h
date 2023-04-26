@@ -27,11 +27,12 @@ char *_getenv(const char *name);
 char *_strchr(char *s, char c);
 char *_strstr(char *haystack, char *needle);
 int _strncmp(const char *s1, const char *s2, size_t n);
-
+char *_memcpy(char *dest, char *src, unsigned int n);
 
 /* MISCELLANEOUS */
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
 void handle_relative_path(char *const argv[], char *const env[]);
+ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 
 #endif
