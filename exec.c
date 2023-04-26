@@ -114,9 +114,7 @@ void handle_rel_path(const char *p_name, char *const argv[], char *const env[])
 	else
 	{
 		write(STDERR_FILENO, p_name, _strlen(p_name));
-		write(STDERR_FILENO, ": ", 2);
-		write(STDERR_FILENO, argv[0], _strlen(argv[0]));
-		write(STDERR_FILENO, ": not found", 12);
+		write(STDERR_FILENO, ": No such file or directory", 27);
 		_putchar('\n');
 	}
 }
