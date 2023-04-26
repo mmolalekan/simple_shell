@@ -33,6 +33,6 @@ char *_memcpy(char *dest, char *src, unsigned int n);
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-void handle_relative_path(const char *pathname, char *const argv[], char *const env[]);
+void handle_rel_path(const char *p_name, char *const argv[], char *const env[]);
 
 #endif

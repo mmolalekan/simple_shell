@@ -77,19 +77,20 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	}
 	else
 	{
-		handle_relative_path(pathname, argv, env);
+		handle_rel_path(pathname, argv, env);
 	}
 	return (0);
 }
 
 /**
- * handle_relative_path - Handle relative path for executables
+ * handle_rel_path - Handle relative path for executables
  *
+ * @p_name: Name of program
  * @argv: argument vector list
  * @env: enviroment variables
  */
 
-void handle_relative_path(const char *pathname, char *const argv[], char *const env[])
+void handle_rel_path(const char *p_name, char *const argv[], char *const env[])
 {
 	char *filepath;
 	int i;
@@ -112,7 +113,7 @@ void handle_relative_path(const char *pathname, char *const argv[], char *const 
 	}
 	else
 	{
-		write(STDERR_FILENO, pathname, _strlen(pathname));
+		write(STDERR_FILENO, p_name, _strlen(p_name));
 		write(STDERR_FILENO, ": ", 2);
 		write(STDERR_FILENO, argv[0], _strlen(argv[0]));
 		write(STDERR_FILENO, ": not found", 12);
