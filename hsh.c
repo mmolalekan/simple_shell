@@ -23,8 +23,8 @@ int main(int ac, char **av, char **env)
 	_putchar(' ');
 	while ((nread = getline(&buffer, &n, stdin)) != -1)
 	{
-		if (nread == 0)
-		exit(EXIT_SUCCESS);
+		/*if (nread == 0)
+		exit(EXIT_SUCCESS);*/
 		if (buffer[0] == '\n')
 		continue;
 		for (i = 0; buffer[i]; i++)
@@ -42,7 +42,10 @@ int main(int ac, char **av, char **env)
 		execute(av[0], argv, env);
 		write(STDOUT_FILENO, "$ ", 2);
 	}
-	write(STDOUT_FILENO, "\n", 1);
+	if (nread == -1)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+	}
 	free(buffer);
 	return (EXIT_SUCCESS);
 }
