@@ -24,7 +24,7 @@ int main(int ac, char **av, char **env)
 	while ((nread = getline(&buffer, &n, stdin)) != -1)
 	{
 		if (nread == 0)
-		break;
+		exit(EXIT_SUCCESS);
 		if (buffer[0] == '\n')
 		continue;
 		for (i = 0; buffer[i]; i++)
