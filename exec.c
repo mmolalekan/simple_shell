@@ -77,20 +77,20 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	}
 	else
 	{
-		handle_rel_path(pathname, argv, env);
+		handle_rl_path(pathname, argv, env);
 	}
 	return (0);
 }
 
 /**
- * handle_rel_path - Handle relative path for executables
+ * handle_rl_path - Handle relative path for executables
  *
  * @p_name: Name of program
  * @argv: argument vector list
  * @env: enviroment variables
  */
 
-void handle_rel_path(const char *p_name, char *const argv[], char *const env[])
+void handle_rl_path(const char *p_name, char *const argv[], char *const env[])
 {
 	char *filepath;
 	int i;

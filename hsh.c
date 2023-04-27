@@ -21,13 +21,13 @@ int main(int ac, char **av, char **env)
 	(void) **av;
 	_putchar('$');
 	_putchar(' ');
-	while ((nread = getline(&buffer, &n, stdin))!= -1)
+	while ((nread = getline(&buffer, &n, stdin)) != -1)
 	{
 		if (nread == 0)
 		break;
 		if (buffer[0] == '\n')
 		continue;
-		for (i = 0; buffer[i]; i++) 
+		for (i = 0; buffer[i]; i++)
 		{
 			if (buffer[i] == '\n')
 				buffer[i] = '\0';
