@@ -19,22 +19,15 @@ int main(int ac, char **av, char **env)
 
 	(void) ac;
 	(void) **av;
-	while (1)
+	_putchar('$');
+	_putchar(' ');
+	while ((nread = getline(&buffer, &n, stdin))!= -1)
 	{
-		buffer = NULL;
-		_putchar('$');
-		_putchar(' ');
-		nread = getline(&buffer, &n, stdin);
-		if (nread == -1)
-		{
-			write(2, buffer, nread);
-			perror("");
-			free(buffer);
-			exit(98);
-		}
+		if (nread == 0)
+		break;
 		if (buffer[0] == '\n')
 		continue;
-		for (i = 0; i < nread; i++)
+		for (i = 0; buffer[i]; i++) 
 		{
 			if (buffer[i] == '\n')
 				buffer[i] = '\0';
@@ -47,7 +40,9 @@ int main(int ac, char **av, char **env)
 			argv[i] = strtok(NULL, " ");
 		}
 		execute(av[0], argv, env);
+		write(STDOUT_FILENO, "$ ", 2);
 	}
+	write(STDOUT_FILENO, "\n", 1);
 	free(buffer);
-	return (0);
+	return (EXIT_SUCCESS);
 }
