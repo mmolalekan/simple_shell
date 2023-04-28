@@ -4,6 +4,23 @@
 #include <sys/types.h>
 
 /**
+ * is_space - check for leading and trailing whitespaces
+ *
+ * @c: character to check
+ * Return: int
+ */
+
+int is_space(int c)
+{
+	return (c == ' ' ||
+			c == '\t' ||
+			c == '\n' ||
+			c == '\r' ||
+			c == '\f' ||
+			c == '\v');
+}
+
+/**
  * tokenize - Make command line arguments into tokens
  *
  * @lineptr: String to tokenize
@@ -34,6 +51,35 @@ char **tokenize(char *lineptr, char *delim)
 	}
 
 	return (arr);
+}
+
+/**
+ * trim_space - remove leading and trailing spaces
+ *
+ * @input: pointer to string to trim
+ * Return: void*
+ */
+
+void trim_space(char *input)
+{
+	size_t len = _strlen(input);
+	size_t lead = 0;
+
+	printf("$ %s\n", input);
+	while (is_space(input[lead]) && lead < len)
+	{
+		lead++;
+	}
+	if (lead > 0)
+	{
+		memmove(input, input + lead, len + 1);
+		len -= lead;
+	}
+	while (len > 0 && is_space(input[len - 1]))
+	{
+		len--;
+	}
+	input[len] = '\0';
 }
 
 /**
@@ -97,7 +143,6 @@ void handle_rl_path(const char *p_name, char *const argv[], char *const env[])
 
 	char __attribute__((unused)) *new_argv[1024 * sizeof(char)];
 	filepath = search_path(argv[0]);
-	/*for (i = 0; )*/
 	if (filepath)
 	{
 		for (i = 0; new_argv[i]; i++)

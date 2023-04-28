@@ -28,12 +28,15 @@ char *_strchr(char *s, char c);
 char *_strstr(char *haystack, char *needle);
 int _strncmp(const char *s1, const char *s2, size_t n);
 char *_memcpy(char *dest, char *src, unsigned int n);
+void *_memmove(void *dest, const void *src, size_t n);
 
 /* MISCELLANEOUS */
-void display_prompt();
+void display_prompt(void);
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 void handle_rl_path(const char *p_name, char *const argv[], char *const env[]);
+int is_space(int c);
+void trim_space(char *input);
 
 #endif

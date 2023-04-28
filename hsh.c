@@ -1,8 +1,17 @@
 #include "shell.h"
 
-void display_prompt()
+/**
+ * display_prompt - displays prompt if in interactive mode
+ *
+ */
+
+void display_prompt(void)
 {
-	write(STDOUT_FILENO, "$ ", 2);
+	if (isatty(STDIN_FILENO))
+	{
+		write(STDOUT_FILENO, "$ ", 2);
+		fflush(stdout);
+	}
 }
 
 /**
@@ -22,17 +31,17 @@ int main(int ac, char **av, char **env)
 	ssize_t nread;
 	int i = 0;
 
-	(void) ac;
-	(void) **av;
-
+	(void)ac;
+	(void)**av;
 	if (isatty(STDIN_FILENO))
-	display_prompt();
+		display_prompt();
 	while ((nread = getline(&buffer, &n, stdin)) != -1)
 	{
-		/*if (nread == 0)
-		exit(EXIT_SUCCESS);*/
 		if (buffer[0] == '\n')
-		continue;
+		{
+			display_prompt();
+			continue;
+		}
 		for (i = 0; buffer[i]; i++)
 		{
 			if (buffer[i] == '\n')
@@ -45,8 +54,8 @@ int main(int ac, char **av, char **env)
 			i++;
 			argv[i] = strtok(NULL, " ");
 		}
+		if (i > 0)
 		execute(av[0], argv, env);
-		if (isatty(STDIN_FILENO))
 		display_prompt();
 	}
 	if (nread == -1)
