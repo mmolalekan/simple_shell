@@ -123,20 +123,21 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	}
 	else
 	{
-		handle_rl_path(pathname, argv, env);
+		handle_p(&command_count, pathname, argv, env);
 	}
 	return (0);
 }
 
 /**
- * handle_rl_path - Handle relative path for executables
+ * handle_p - Handle relative path for executables
  *
- * @p_name: Name of program
+ * @cm: num of commands
+ * @name: Name of program
  * @argv: argument vector list
  * @env: enviroment variables
  */
 
-void handle_rl_path(const char *p_name, char *const argv[], char *const env[])
+void handle_p(size_t *cm, const char *name, char *const argv[], char *const env[])
 {
 	char *filepath;
 	int i;
@@ -158,8 +159,16 @@ void handle_rl_path(const char *p_name, char *const argv[], char *const env[])
 	}
 	else
 	{
-		write(STDERR_FILENO, p_name, _strlen(p_name));
-		write(STDERR_FILENO, ": No such file or directory", 27);
+		char str[10];
+
+		++*cm;
+		_itoa(*cm, str, 10);
+		write(STDERR_FILENO, name, _strlen(name));
+		write(STDERR_FILENO, ": ", 2);
+		write(STDERR_FILENO, str, _strlen(str));
+		write(STDERR_FILENO, ": ", 2);
+		write(STDERR_FILENO, argv[0], _strlen(argv[0]));
+		write(STDERR_FILENO, ": not found", 11);
 		_putchar('\n');
 	}
 }
