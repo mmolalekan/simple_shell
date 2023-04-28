@@ -55,7 +55,12 @@ int main(int ac, char **av, char **env)
 			argv[i] = strtok(NULL, " ");
 		}
 		if (i > 0)
-		execute(av[0], argv, env);
+		{
+			if (execute(av[0], argv, env) && !(isatty(STDIN_FILENO)))
+			{
+				return (127);
+			}
+		}
 		display_prompt();
 	}
 	if (nread == -1)
