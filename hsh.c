@@ -1,5 +1,10 @@
 #include "shell.h"
 
+void display_prompt()
+{
+	write(STDOUT_FILENO, "$ ", 2);
+}
+
 /**
  * main - Interactive shell
  *
@@ -19,8 +24,9 @@ int main(int ac, char **av, char **env)
 
 	(void) ac;
 	(void) **av;
-	_putchar('$');
-	_putchar(' ');
+
+	if (isatty(STDIN_FILENO))
+	display_prompt();
 	while ((nread = getline(&buffer, &n, stdin)) != -1)
 	{
 		/*if (nread == 0)
@@ -40,11 +46,12 @@ int main(int ac, char **av, char **env)
 			argv[i] = strtok(NULL, " ");
 		}
 		execute(av[0], argv, env);
-		write(STDOUT_FILENO, "$ ", 2);
+		if (isatty(STDIN_FILENO))
+		display_prompt();
 	}
 	if (nread == -1)
 	{
-		write(STDOUT_FILENO, "\n", 1);
+		write(STDOUT_FILENO, "", 0);
 	}
 	free(buffer);
 	return (EXIT_SUCCESS);

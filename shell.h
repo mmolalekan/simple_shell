@@ -30,6 +30,7 @@ int _strncmp(const char *s1, const char *s2, size_t n);
 char *_memcpy(char *dest, char *src, unsigned int n);
 
 /* MISCELLANEOUS */
+void display_prompt();
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
