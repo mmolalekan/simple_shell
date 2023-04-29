@@ -123,7 +123,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	}
 	else
 	{
-		rpath(&command_count, pathname, argv, env);
+		if (rpath(&command_count, pathname, argv, env) == 1)
 		return (127);
 	}
 	return (0);
@@ -138,7 +138,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
  * @env: enviroment variables
  */
 
-void rpath(size_t *cm, const char *name, char *const av[], char *const env[])
+int rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 {
 	char *filepath = NULL;
 	size_t i;
@@ -158,6 +158,7 @@ void rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 		write(STDERR_FILENO, ": ", 2);
 		write(STDERR_FILENO, av[0], _strlen(av[0]));
 		write(STDERR_FILENO, ": not found\n", 12);
+		return (1);
 	}
 	else
 	{
@@ -175,4 +176,5 @@ void rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 		free(filepath);
 		execute(new_argv[0], new_argv, env);
 	}
+	return (0);
 }

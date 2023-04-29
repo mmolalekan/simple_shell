@@ -33,6 +33,7 @@ void *_memmove(void *dest, const void *src, size_t n);
 void _itoa(int num, char *str, int radix);
 char *_strtok(char *str, char *delim);
 char **strtow(char *str);
+int rpath(size_t *cm, const char *name, char *const av[], char *const env[]);
 
 /* MISCELLANEOUS */
 void display_prompt(void);
