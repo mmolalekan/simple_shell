@@ -88,16 +88,17 @@ void trim_space(char *input)
  * @pathname: path to execute file
  * @argv: Argument list
  * @env: Environment variable
+ * @buf: mem alloced buffer
  * Return: int
  */
-int execute(const char *pathname, char *const argv[], char *const env[])
+int execute(const char *path, char *const argv[], char *const env[], char *buf)
 {
 	pid_t pid;
 	int n;
 	size_t command_count = 0;
 
 	if (_strcmp(argv[0], "exit") == 0)
-	exit(EXIT_SUCCESS);
+	e_exit(EXIT_SUCCESS, buf);
 	if ((argv[0][0] == '/') == 1 || argv[0][0] == '.')
 	{
 		++command_count;
@@ -112,6 +113,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 		else if (pid > 0)
 		{
 			waitpid(pid, &n, 0);
+			free(buf);
 			return (0);
 		}
 		else
@@ -123,7 +125,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	}
 	else
 	{
-		if (rpath(&command_count, pathname, argv, env) == 1)
+		if (rpath(&command_count, path, argv, env) == 1)
 		return (127);
 	}
 	return (0);
@@ -172,9 +174,7 @@ int rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 			i++;
 		}
 		new_argv[i] = NULL;
-		filepath = NULL;
-		free(filepath);
-		execute(new_argv[0], new_argv, env);
+		execute(new_argv[0], new_argv, env, filepath);
 	}
 	return (0);
 }

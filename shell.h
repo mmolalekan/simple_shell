@@ -13,7 +13,7 @@
 extern char **environ;
 
 /*CORE*/
-int execute(const char *pathname, char *const argv[], char *const env[]);
+int execute(const char *path, char *const argv[], char *const env[], char *bu);
 void loop(char **av, char *buffer, ssize_t *nread, char **env);
 
 /* UTILS */
@@ -33,6 +33,7 @@ void *_memmove(void *dest, const void *src, size_t n);
 void _itoa(int num, char *str, int radix);
 char *_strtok(char *str, char *delim);
 char **strtow(char *str);
+void e_exit(int status, char *buffer);
 
 /* MISCELLANEOUS */
 void display_prompt(void);

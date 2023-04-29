@@ -79,7 +79,7 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 		argv[i] = NULL;
 		if (i > 0)
 		{
-			if (execute(av[0], argv, env) == 127 && !(isatty(STDIN_FILENO)))
+			if (execute(av[0], argv, env, buffer) == 127 && !(isatty(STDIN_FILENO)))
 			{
 				free(buffer);
 				exit(127);
