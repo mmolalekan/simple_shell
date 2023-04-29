@@ -26,16 +26,36 @@ void display_prompt(void)
 int main(int ac, char **av, char **env)
 {
 	char *buffer = NULL;
-	char *argv[100];
-	size_t n = 0;
 	ssize_t nread;
-	int i = 0;
 
 	(void)ac;
 	(void)**av;
-	if (isatty(STDIN_FILENO))
-		display_prompt();
-	while ((nread = getline(&buffer, &n, stdin)) != -1)
+	loop(av, buffer, &nread, env);
+	if (nread == -1)
+	{
+		write(STDOUT_FILENO, "", 0);
+	}
+	free(buffer);
+	return (EXIT_SUCCESS);
+}
+
+/**
+ * loop - the shell loop
+ *
+ * @av: Argument vector
+ * @buffer: Buffer
+ * @nread: number of characters read
+ * @env: environment variable
+ */
+
+void loop(char **av, char *buffer, ssize_t *nread, char **env)
+{
+	char *argv[100];
+	size_t n = 0;
+	int i = 0;
+
+	display_prompt();
+	while ((*nread = getline(&buffer, &n, stdin)) != -1)
 	{
 		if (buffer[0] == '\n')
 		{
@@ -55,13 +75,12 @@ int main(int ac, char **av, char **env)
 			argv[i] = strtok(NULL, " ");
 		}
 		if (i > 0)
-		execute(av[0], argv, env);
+		{
+			if (execute(av[0], argv, env) && !(isatty(STDIN_FILENO)))
+			{
+				exit(127);
+			}
+		}
 		display_prompt();
 	}
-	if (nread == -1)
-	{
-		write(STDOUT_FILENO, "", 0);
-	}
-	free(buffer);
-	return (EXIT_SUCCESS);
 }
