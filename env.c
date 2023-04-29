@@ -97,3 +97,14 @@ char *_getenv(const char *name)
 	}
 	return (env_value);
 }
+
+void print_env()
+{
+	int i = 0;
+	while (environ[i])
+	{
+		write(STDOUT_FILENO, environ[i], _strlen(environ[i]));
+		write(STDOUT_FILENO, "\n", 1);
+		i++;
+	}
+}

@@ -34,6 +34,7 @@ void _itoa(int num, char *str, int radix);
 char *_strtok(char *str, char *delim);
 char **strtow(char *str);
 void e_exit(int status, char *buffer);
+void print_env();
 
 /* MISCELLANEOUS */
 void display_prompt(void);

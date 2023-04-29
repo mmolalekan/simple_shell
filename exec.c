@@ -99,7 +99,9 @@ int execute(const char *path, char *const argv[], char *const env[], char *buf)
 
 	if (_strcmp(argv[0], "exit") == 0)
 	e_exit(EXIT_SUCCESS, buf);
-	if ((argv[0][0] == '/') == 1 || argv[0][0] == '.')
+	if (_strcmp(argv[0], "env") == 0)
+	print_env();
+	else if ((argv[0][0] == '/') == 1 || argv[0][0] == '.')
 	{
 		++command_count;
 		pid = fork();
