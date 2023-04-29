@@ -36,7 +36,7 @@ int main(int ac, char **av, char **env)
 		write(STDOUT_FILENO, "", 0);
 	}
 	free(buffer);
-	return (EXIT_SUCCESS);
+	return (0);
 }
 
 /**
@@ -76,7 +76,7 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 		}
 		if (i > 0)
 		{
-			if (execute(av[0], argv, env) && !(isatty(STDIN_FILENO)))
+			if (execute(av[0], argv, env) == 127 && !(isatty(STDIN_FILENO)))
 			{
 				exit(127);
 			}
