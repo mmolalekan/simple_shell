@@ -33,14 +33,13 @@ void *_memmove(void *dest, const void *src, size_t n);
 void _itoa(int num, char *str, int radix);
 char *_strtok(char *str, char *delim);
 char **strtow(char *str);
-int rpath(size_t *cm, const char *name, char *const av[], char *const env[]);
 
 /* MISCELLANEOUS */
 void display_prompt(void);
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-void rpath(size_t *cm, const char *name, char *const av[], char *const env[]);
+int rpath(size_t *cm, const char *name, char *const av[], char *const env[]);
 int is_space(int c);
 void trim_space(char *input);
 void rev_string(char *s);
