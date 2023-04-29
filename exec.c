@@ -123,37 +123,36 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	}
 	else
 	{
-		rpath(&command_count, pathname, argv, env);
-		return (127);
+		handle_p(&command_count, pathname, argv, env);
 	}
 	return (0);
 }
 
 /**
- * rpath - Handle relative path for executables
+ * handle_p - Handle relative path for executables
  *
  * @cm: num of commands
  * @name: Name of program
- * @av: argument vector list
+ * @argv: argument vector list
  * @env: enviroment variables
  */
 
-void rpath(size_t *cm, const char *name, char *const av[], char *const env[])
+void handle_p(size_t *cm, const char *name, char *const argv[], char *const env[])
 {
 	char *filepath;
 	int i;
 
 	char __attribute__((unused)) *new_argv[1024 * sizeof(char)];
-	filepath = search_path(av[0]);
+	filepath = search_path(argv[0]);
 	if (filepath)
 	{
 		for (i = 0; new_argv[i]; i++)
 			new_argv[i] = '\0';
 		new_argv[0] = filepath;
 		i = 1;
-		while (av[i])
+		while (argv[i])
 		{
-			new_argv[i] = av[i];
+			new_argv[i] = argv[i];
 			i++;
 		}
 		execute(new_argv[0], new_argv, env);
@@ -168,7 +167,8 @@ void rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 		write(STDERR_FILENO, ": ", 2);
 		write(STDERR_FILENO, str, _strlen(str));
 		write(STDERR_FILENO, ": ", 2);
-		write(STDERR_FILENO, av[0], _strlen(av[0]));
-		write(STDERR_FILENO, ": not found\n", 12);
+		write(STDERR_FILENO, argv[0], _strlen(argv[0]));
+		write(STDERR_FILENO, ": not found", 11);
+		_putchar('\n');
 	}
 }

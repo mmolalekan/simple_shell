@@ -66,7 +66,7 @@ void _itoa(int num, char *str, int radix)
 	while (num != 0)
 	{
 		int remainder = num % radix;
-
+		
 		str[i] = (remainder > 9) ? (remainder - 10) + 'a' : remainder + '0';
 		i++;
 		num /= radix;
