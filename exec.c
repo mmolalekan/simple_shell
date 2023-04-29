@@ -100,7 +100,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 	exit(EXIT_SUCCESS);
 	if ((argv[0][0] == '/') == 1 || argv[0][0] == '.')
 	{
-		command_count++;
+		++command_count;
 		pid = fork();
 		if (pid == 0)
 		{
@@ -116,7 +116,7 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 		}
 		else
 		{
-			command_count++;
+			++command_count;
 			perror("process");
 			return (-1);
 		}
@@ -140,28 +140,16 @@ int execute(const char *pathname, char *const argv[], char *const env[])
 
 void rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 {
-	char *filepath;
-	int i;
+	char *filepath = NULL;
+	size_t i;
 
 	char __attribute__((unused)) *new_argv[1024 * sizeof(char)];
 	filepath = search_path(av[0]);
-	if (filepath)
-	{
-		for (i = 0; new_argv[i]; i++)
-			new_argv[i] = '\0';
-		new_argv[0] = filepath;
-		i = 1;
-		while (av[i])
-		{
-			new_argv[i] = av[i];
-			i++;
-		}
-		execute(new_argv[0], new_argv, env);
-	}
-	else
+	if (filepath == NULL)
 	{
 		char str[10];
 
+		free(filepath);
 		++*cm;
 		_itoa(*cm, str, 10);
 		write(STDERR_FILENO, name, _strlen(name));
@@ -170,5 +158,21 @@ void rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 		write(STDERR_FILENO, ": ", 2);
 		write(STDERR_FILENO, av[0], _strlen(av[0]));
 		write(STDERR_FILENO, ": not found\n", 12);
+	}
+	else
+	{
+		for (i = 0; i < sizeof(new_argv) / sizeof(char *); i++)
+			new_argv[i] = '\0';
+		new_argv[0] = filepath;
+		i = 1;
+		while (av[i])
+		{
+			new_argv[i] = av[i];
+			i++;
+		}
+		new_argv[i] = NULL;
+		filepath = NULL;
+		free(filepath);
+		execute(new_argv[0], new_argv, env);
 	}
 }

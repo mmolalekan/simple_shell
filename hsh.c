@@ -60,6 +60,8 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 		if (buffer[0] == '\n')
 		{
 			display_prompt();
+			free(buffer);
+			buffer = NULL;
 			continue;
 		}
 		for (i = 0; buffer[i]; i++)
@@ -74,10 +76,12 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 			i++;
 			argv[i] = strtok(NULL, " ");
 		}
+		argv[i] = NULL;
 		if (i > 0)
 		{
 			if (execute(av[0], argv, env) == 127 && !(isatty(STDIN_FILENO)))
 			{
+				free(buffer);
 				exit(127);
 			}
 		}
