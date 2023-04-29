@@ -22,9 +22,9 @@ int _putenv(const char *name, const char *value)
 	if (env_var == NULL)
 		return (-1);
 
-	_strcpy(env_var, name);
+	_strcpy(env_var, (void *) name);
 	_strcpy(env_var + name_len, "=");
-	_strcpy(env_var + name_len + 1, value);
+	_strcpy(env_var + name_len + 1, (void *) value);
 
 	for (i = 0; environ[i] != NULL; i++)
 	{
@@ -52,19 +52,23 @@ int _putenv(const char *name, const char *value)
  */
 int _setenv(const char *name, const char *value, int overwrite)
 {
-	if (name == NULL || name[0] == '\0' || _strchr(name, '=') != NULL)
+	size_t name_len;
+	size_t value_len;
+	char *env_str;
+
+	if (name == NULL || name[0] == '\0' || _strchr((void *) name, '=') != NULL)
 		return (-1);
 
-	size_t name_len = _strlen(name);
-	size_t value_len = _strlen(value);
-	char *env_str = malloc(name_len + value_len + 2);
+	name_len = _strlen(name);
+	value_len = _strlen(value);
+	env_str = malloc(name_len + value_len + 2);
 
 	if (env_str == NULL)
 		return (-1);
 
-	_memcpy(env_str, name, name_len);
+	_memcpy(env_str, (void *) name, name_len);
 	env_str[name_len] = '=';
-	_memcpy(env_str + name_len + 1, value, value_len);
+	_memcpy(env_str + name_len + 1, (void *) value, value_len);
 	env_str[name_len + value_len + 1] = '\0';
 
 	if (!overwrite && _getenv(name) != NULL)

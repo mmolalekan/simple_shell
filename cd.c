@@ -13,7 +13,7 @@ int cd(const char *dir)
 
 	if (!dir)
 		home = _getenv("HOME");
-	else if (!_strcmp(dir, "-"))
+	else if (!_strcmp((void *) dir, "-"))
 	{
 		prev = _getenv("OLDPWD");
 		if (!prev)

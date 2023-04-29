@@ -72,7 +72,7 @@ void trim_space(char *input)
 	}
 	if (lead > 0)
 	{
-		memmove(input, input + lead, len + 1);
+		_memmove(input, input + lead, len + 1);
 		len -= lead;
 	}
 	while (len > 0 && is_space(input[len - 1]))

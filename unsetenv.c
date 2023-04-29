@@ -1,3 +1,6 @@
+#include "shell.h"
+#include <errno.h>
+
 /**
  * unsetenv - remove a variable from the environment
  * @name: the name of the variable to remove
@@ -9,7 +12,7 @@ int unsetenv(const char *name)
 	int i, j, len;
 	extern char **environ;
 
-	if (!name || !*name || _strchr(name, '='))
+	if (!name || !*name || _strchr((void *) name, '='))
 	{
 		errno = EINVAL;
 		return (-1);
