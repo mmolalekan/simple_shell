@@ -9,6 +9,7 @@
 
 void e_exit(int status, char *buffer)
 {
+	if (isatty(STDIN_FILENO))
 	free(buffer);
 	exit(status);
 }
