@@ -85,7 +85,7 @@ void trim_space(char *input)
 /**
  * execute - execute programs
  *
- * @pathname: path to execute file
+ * @path: path to execute file
  * @argv: Argument list
  * @env: Environment variable
  * @buf: mem alloced buffer
@@ -140,6 +140,7 @@ int execute(const char *path, char *const argv[], char *const env[], char *buf)
  * @name: Name of program
  * @av: argument vector list
  * @env: enviroment variables
+ * Return: int
  */
 
 int rpath(size_t *cm, const char *name, char *const av[], char *const env[])

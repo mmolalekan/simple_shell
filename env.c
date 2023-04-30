@@ -1,6 +1,5 @@
 #include "shell.h"
 
-
 /**
  * _strchr - finds a character in a string
  * @s: input
@@ -18,7 +17,6 @@ char *_strchr(char *s, char c)
 	}
 	return (0);
 }
-
 
 /**
  * _strstr - Entry point
@@ -98,10 +96,16 @@ char *_getenv(const char *name)
 	return (env_value);
 }
 
-void print_env()
+/**
+ * print_env - print environment
+ *
+ */
+
+void print_env(void)
 {
 	int i = 0;
-	while (environ[i])
+
+	while (environ && environ[i])
 	{
 		write(STDOUT_FILENO, environ[i], _strlen(environ[i]));
 		write(STDOUT_FILENO, "\n", 1);
