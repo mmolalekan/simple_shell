@@ -32,7 +32,7 @@ char *_memcpy(char *dest, char *src, unsigned int n);
 void *_memmove(void *dest, const void *src, size_t n);
 void _itoa(int num, char *str, int radix);
 char *_strtok(char *str, char *delim);
-char **strtow(char *str);
+int cd(char *path);
 void e_exit(int status, char *buffer);
 void print_env(void);
 
@@ -45,5 +45,6 @@ int rpath(size_t *cm, const char *name, char *const av[], char *const env[]);
 int is_space(int c);
 void trim_space(char *input);
 void rev_string(char *s);
+int check_builtin(char *cmd[], char *buf);
 
 #endif

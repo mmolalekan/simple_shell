@@ -97,10 +97,10 @@ int execute(const char *path, char *const argv[], char *const env[], char *buf)
 	int n;
 	size_t command_count = 0;
 
-	if (_strcmp(argv[0], "exit") == 0)
-	e_exit(EXIT_SUCCESS, buf);
-	if (_strcmp(argv[0], "env") == 0)
-	print_env();
+	if (check_builtin((void *)argv, buf) == 0)
+	{
+		return (EXIT_SUCCESS);
+	}
 	else if ((argv[0][0] == '/') == 1 || argv[0][0] == '.')
 	{
 		++command_count;
