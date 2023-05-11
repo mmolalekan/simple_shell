@@ -35,6 +35,9 @@ char *_strtok(char *str, char *delim);
 int cd(char *path);
 void e_exit(int status, char *buffer);
 void print_env(void);
+int _setenv(char *cmd[]);
+int _unsetenv(char *cmd[]);
+char *_memset(char *s, char b, unsigned int n);
 
 /* MISCELLANEOUS */
 void display_prompt(void);
