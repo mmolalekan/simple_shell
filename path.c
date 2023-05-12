@@ -17,7 +17,7 @@ int cd(char *path)
 		dir = home;
 	else if (path)
 	{
-		if (strcmp(path, "-") == 0)
+		if (_strcmp(path, "-") == 0)
 			dir = _getenv("OLDPWD");
 		else
 			dir = path;
