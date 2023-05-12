@@ -20,14 +20,12 @@ int check_builtin(char *cmd[], char *buf)
 	else if (_strcmp(cmd[0], "env") == 0)
 	print_env();
 	else if (_strcmp(cmd[0], "setenv") == 0)
-	{
-		_setenv(cmd);
-	}
+	_setenv(cmd);
 	else if (_strcmp(cmd[0], "unsetenv") == 0)
 	_unsetenv(cmd);
+	else if (_strcmp(cmd[0], "cd") == 0)
+	cd(cmd[1]);
 	else
-	{
-		return (-1);
-	}
+	return (-1);
 	return (0);
 }
