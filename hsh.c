@@ -50,7 +50,7 @@ int main(int ac, char **av, char **env)
 
 void loop(char **av, char *buffer, ssize_t *nread, char **env)
 {
-	char *argv[100];
+	char *argv[100], *multi_command[1024];
 	size_t n = 0;
 	int i = 0;
 
@@ -70,10 +70,36 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 				buffer[i] = '\0';
 		}
 		i = 0;
+		if (strchr(buffer, ';'))
+		{
+			multi_command[i] = strtok(buffer, ";");
+			while (multi_command[i] != NULL)
+			{
+				i++;
+				multi_command[i] = strtok(NULL, ";");
+			}
+		}
+		multi_command[i] = NULL;
+		run_exec(buffer, av, env, argv, multi_command);
+		display_prompt();
+	}
+}
+
+void run_exec(
+	char *buffer,
+	char **av,
+	char **env,
+	char *argv[],
+	char *multi_command[])
+{
+	int i = 0, j = 0;
+
+	do {
+		i = 0;
 		argv[i] = strtok(buffer, " ");
 		while (argv[i] != NULL)
 		{
-			i++;
+			++i;
 			argv[i] = strtok(NULL, " ");
 		}
 		argv[i] = NULL;
@@ -85,6 +111,8 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 				exit(127);
 			}
 		}
-		display_prompt();
-	}
+		++j;
+		buffer = NULL;
+		buffer = multi_command[j];
+	} while (multi_command[j] != NULL);
 }

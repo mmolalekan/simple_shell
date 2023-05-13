@@ -18,3 +18,6 @@ if name is found
 delete from the list
 move subsequent item up by one
 
+check if buffer contains ;
+if yes strtok using ;
+then while arr from string to k is not NULL call execute

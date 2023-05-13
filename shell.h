@@ -38,6 +38,12 @@ void print_env(void);
 int _setenv(char *cmd[]);
 int _unsetenv(char *cmd[]);
 char *_memset(char *s, char b, unsigned int n);
+void run_exec(
+	char *buffer,
+	char **av,
+	char **env,
+	char *argv[],
+	char *multi_command[]);
 
 /* MISCELLANEOUS */
 void display_prompt(void);
