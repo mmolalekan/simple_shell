@@ -14,19 +14,13 @@ int cd(char *path)
 	char cwd[1024];
 
 	if (!path)
-	{
 		dir = home;
-	}
 	else if (path)
 	{
-		if (strcmp(path, "-") == 0)
-		{
+		if (_strcmp(path, "-") == 0)
 			dir = _getenv("OLDPWD");
-		}
 		else
-		{
 			dir = path;
-		}
 	}
 	else
 	{
@@ -41,19 +35,19 @@ int cd(char *path)
 	if (chdir(dir) == -1)
 	{
 		perror("chdir() error");
-		return 1;
+		return (1);
 	}
 	if (setenv("OLDPWD", cwd, 1) == -1)
 	{
 		perror("setenv() error");
-		return 1;
+		return (1);
 	}
 	if (setenv("PWD", getcwd(cwd, sizeof(cwd)), 1) == -1)
 	{
 		perror("setenv() error");
-		return 1;
+		return (1);
 	}
-	return 0;
+	return (0);
 }
 
 /**

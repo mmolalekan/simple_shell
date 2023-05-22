@@ -50,9 +50,9 @@ int main(int ac, char **av, char **env)
 
 void loop(char **av, char *buffer, ssize_t *nread, char **env)
 {
-	char *argv[100];
+	char *argv[100], *multi_command[1024];
 	size_t n = 0;
-	int i = 0;
+	int i = 0, has_AND;
 
 	display_prompt();
 	while ((*nread = getline(&buffer, &n, stdin)) != -1)
@@ -70,21 +70,86 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 				buffer[i] = '\0';
 		}
 		i = 0;
+		has_AND = check_multi_command(buffer, multi_command);
+		run_exec(buffer, av, env, argv, multi_command, has_AND);
+		display_prompt();
+	}
+}
+
+void run_exec(
+	char *buffer,
+	char **av,
+	char **env,
+	char *argv[],
+	char *multi_command[],
+	int has_AND)
+{
+	int i, j = 0, b = 0;
+
+	do
+	{
+		i = 0;
 		argv[i] = strtok(buffer, " ");
 		while (argv[i] != NULL)
 		{
-			i++;
+			++i;
 			argv[i] = strtok(NULL, " ");
 		}
 		argv[i] = NULL;
 		if (i > 0)
 		{
-			if (execute(av[0], argv, env, buffer) == 127 && !(isatty(STDIN_FILENO)))
+			if (execute(av[0], argv, env, buffer, &b) == 127 && !(isatty(STDIN_FILENO)))
 			{
-				free(buffer);
 				exit(127);
+				free(buffer);
 			}
 		}
-		display_prompt();
+		if (b == 1 && has_AND == 1)
+		break;
+		++j;
+		buffer = NULL;
+		buffer = multi_command[j];
+	} while (multi_command[j] != NULL);
+}
+
+int check_multi_command(char *buffer, char *multi_command[])
+{
+	int i = 0;
+	char *linker;
+	if (strchr(buffer, ';'))
+	{
+		multi_command[i] = strtok(buffer, ";");
+		while (multi_command[i] != NULL)
+		{
+			i++;
+			multi_command[i] = strtok(NULL, ";");
+		}		
+		multi_command[i] = NULL;
+		return (0);
 	}
+	linker = _strstr(buffer, "||");
+	if (linker)
+	{
+		multi_command[i] = strtok(buffer, "||");
+		while (multi_command[i] != NULL)
+		{
+			i++;
+			multi_command[i] = strtok(NULL, "||");
+		}
+		multi_command[i] = NULL;
+		return (0);
+	}
+	linker = _strstr(buffer, "&&");
+	if (linker)
+	{
+		multi_command[i] = strtok(buffer, "&&");
+		while (multi_command[i] != NULL)
+		{
+			i++;
+			multi_command[i] = strtok(NULL, "&&");
+		}
+		multi_command[i] = NULL;
+		return (1);
+	}
+	return (0);
 }

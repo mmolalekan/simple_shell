@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stddef.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -13,7 +14,12 @@
 extern char **environ;
 
 /*CORE*/
-int execute(const char *path, char *const argv[], char *const env[], char *bu);
+int execute(
+	const char *path,
+	char *const argv[],
+	char *const env[],
+	char *buf,
+	int *should_break);
 void loop(char **av, char *buffer, ssize_t *nread, char **env);
 
 /* UTILS */
@@ -35,13 +41,30 @@ char *_strtok(char *str, char *delim);
 int cd(char *path);
 void e_exit(int status, char *buffer);
 void print_env(void);
+int _setenv(char *cmd[]);
+int _unsetenv(char *cmd[]);
+char *_memset(char *s, char b, unsigned int n);
+void run_exec(
+	char *buffer,
+	char **av,
+	char **env,
+	char *argv[],
+	char *multi_command[],
+	int has_AND);
+int check_multi_command(char *buffer, char *multi_command[]);
+
 
 /* MISCELLANEOUS */
 void display_prompt(void);
 char **tokenize(char *lineptr, char *delim);
 char *search_path(char const *str);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-int rpath(size_t *cm, const char *name, char *const av[], char *const env[]);
+int rpath(
+	size_t *cm,
+	const char *name,
+	char *const av[],
+	char *const env[],
+	int *should_break);
 int is_space(int c);
 void trim_space(char *input);
 void rev_string(char *s);

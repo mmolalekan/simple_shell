@@ -91,12 +91,16 @@ void trim_space(char *input)
  * @buf: mem alloced buffer
  * Return: int
  */
-int execute(const char *path, char *const argv[], char *const env[], char *buf)
+int execute(
+	const char *path,
+	char *const argv[],
+	char *const env[],
+	char *buf,
+	int *should_break)
 {
 	pid_t pid;
 	int n;
 	size_t command_count = 0;
-
 	if (check_builtin((void *)argv, buf) == 0)
 	{
 		return (EXIT_SUCCESS);
@@ -115,6 +119,8 @@ int execute(const char *path, char *const argv[], char *const env[], char *buf)
 		else if (pid > 0)
 		{
 			waitpid(pid, &n, 0);
+			if (n != 0)
+			*should_break = 1;
 			free(buf);
 			return (0);
 		}
@@ -127,8 +133,8 @@ int execute(const char *path, char *const argv[], char *const env[], char *buf)
 	}
 	else
 	{
-		if (rpath(&command_count, path, argv, env) == 1)
-		return (127);
+		if (rpath(&command_count, path, argv, env, should_break) == 1)
+			return (127);
 	}
 	return (0);
 }
@@ -143,12 +149,17 @@ int execute(const char *path, char *const argv[], char *const env[], char *buf)
  * Return: int
  */
 
-int rpath(size_t *cm, const char *name, char *const av[], char *const env[])
+int rpath(
+	size_t *cm,
+	const char *name,
+	char *const av[],
+	char *const env[],
+	int *should_break)
 {
 	char *filepath = NULL;
 	size_t i;
 
-	char __attribute__((unused)) *new_argv[1024 * sizeof(char)];
+	char __attribute__((unused)) * new_argv[1024 * sizeof(char)];
 	filepath = search_path(av[0]);
 	if (filepath == NULL)
 	{
@@ -177,7 +188,7 @@ int rpath(size_t *cm, const char *name, char *const av[], char *const env[])
 			i++;
 		}
 		new_argv[i] = NULL;
-		execute(new_argv[0], new_argv, env, filepath);
+		execute(new_argv[0], new_argv, env, filepath, should_break);
 	}
 	return (0);
 }

@@ -1,77 +1,6 @@
 #include "shell.h"
 
 /**
- * _strchr - finds a character in a string
- * @s: input
- * @c: input
- * Return: Always 0 (Success)
- */
-char *_strchr(char *s, char c)
-{
-	int i = 0;
-
-	for (; s[i] >= '\0'; i++)
-	{
-		if (s[i] == c)
-			return (&s[i]);
-	}
-	return (0);
-}
-
-/**
- * _strstr - Entry point
- * @haystack: input
- * @needle: input
- * Return: Always 0 (Success)
- */
-char *_strstr(char *haystack, char *needle)
-{
-	for (; *haystack != '\0'; haystack++)
-	{
-		char *l = haystack;
-		char *p = needle;
-
-		while (*l == *p && *p != '\0')
-		{
-			l++;
-			p++;
-		}
-
-		if (*p == '\0')
-			return (haystack);
-	}
-
-	return (0);
-}
-
-/**
- * _strncmp - compare two strings up to n characters
- *
- * @s1: string 1
- * @s2: string 2
- * @n: number of characters to compare
- * Return: int
- */
-
-int _strncmp(const char *s1, const char *s2, size_t n)
-{
-	size_t i;
-
-	for (i = 0; i < n; i++)
-	{
-		if (s1[i] != s2[i])
-		{
-			return (s1[i] - s2[i]);
-		}
-		if (s1[i] == '\0' || s2[i] == '\0')
-		{
-			return (0);
-		}
-	}
-	return (0);
-}
-
-/**
  * _getenv - retrieves the value of an environment variable
  * @name: the name of the environment variable
  *
@@ -95,6 +24,89 @@ char *_getenv(const char *name)
 	}
 	return (env_value);
 }
+
+/**
+ * _setenv - Set environment variable
+ *
+ * @cmd: command list
+ * Return: 0 on success and -1 on error
+ */
+
+int _setenv(char *cmd[])
+{
+	int i = 0;
+
+	if (!cmd[1] || !cmd[2])
+	{
+		write(STDERR_FILENO, "Usage: setenv VARIABLE VALUE\n", 30);
+		return (-1);
+	}
+	while (environ[i])
+	{
+		char *linker;
+		size_t num_byte_matched;
+
+		linker = _strchr(environ[i], '=');
+		if (linker == NULL)
+		{
+			return (-1);
+		}
+		num_byte_matched = linker - environ[i];
+		if (_strncmp(environ[i], cmd[1], num_byte_matched) == 0)
+		{
+			_strcpy(linker + 1, cmd[2]);
+			return (0);
+		}
+		i++;
+	}
+	environ[i] = malloc(sizeof(char) * _strlen(cmd[1]) + _strlen(cmd[2]) + 2);
+	if (!environ[i])
+	return (-1);
+	else
+	{
+		_memset(environ[i], 0, _strlen(cmd[1]) + _strlen(cmd[2]) + 2);
+		_strcat(environ[i], cmd[1]);
+		_strcat(environ[i], "=");
+		_strcat(environ[i], cmd[2]);
+	}
+	environ[i + 1] = NULL;
+	return (0);
+}
+
+/**
+ * _unsetenv - delete variable from environ list
+ *
+ * @cmd: command list
+ * Return: 0 on success and -1 on error
+ */
+
+int _unsetenv(char *cmd[])
+{
+	int i = 0;
+
+	if (!cmd[1])
+	{
+		write(STDERR_FILENO, "Usage: unsetenv VARIABLE\n", 26);
+		return (-1);
+	}
+	while (environ[i])
+	{
+		char *linker = strchr(environ[i], '=');
+		size_t n = linker - environ[i];
+
+		if (strncmp(environ[i], cmd[1], n) == 0)
+		{
+			while (environ[i])
+			{
+				environ[i] = environ[i + 1];
+			}
+			return (0);
+		}
+		i++;
+	}
+	return (0);
+}
+
 
 /**
  * print_env - print environment
