@@ -18,7 +18,6 @@ char *_strchr(char *s, char c)
 	return (0);
 }
 
-
 /**
  * _strncmp - compare two strings up to n characters
  *

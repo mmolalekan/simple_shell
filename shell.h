@@ -53,7 +53,6 @@ void run_exec(
 	int has_AND);
 int check_multi_command(char *buffer, char *multi_command[]);
 
-
 /* MISCELLANEOUS */
 void display_prompt(void);
 char **tokenize(char *lineptr, char *delim);
