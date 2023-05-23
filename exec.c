@@ -89,6 +89,7 @@ void trim_space(char *input)
  * @argv: Argument list
  * @env: Environment variable
  * @buf: mem alloced buffer
+ * @status: exit status
  * Return: int
  */
 int execute(
@@ -96,12 +97,12 @@ int execute(
 	char *const argv[],
 	char *const env[],
 	char *buf,
-	int *should_break)
+	int *status)
 {
 	pid_t pid;
-	int n;
 	size_t command_count = 0;
-	if (check_builtin((void *)argv, buf) == 0)
+
+	if (check_builtin((void *)argv, buf, *status) == 0)
 	{
 		return (EXIT_SUCCESS);
 	}
@@ -118,9 +119,7 @@ int execute(
 		}
 		else if (pid > 0)
 		{
-			waitpid(pid, &n, 0);
-			if (n != 0)
-			*should_break = 1;
+			waitpid(pid, status, 0);
 			free(buf);
 			return (0);
 		}
@@ -133,7 +132,7 @@ int execute(
 	}
 	else
 	{
-		if (rpath(&command_count, path, argv, env, should_break) == 1)
+		if (rpath(&command_count, path, argv, env, status) == 1)
 			return (127);
 	}
 	return (0);
@@ -146,6 +145,7 @@ int execute(
  * @name: Name of program
  * @av: argument vector list
  * @env: enviroment variables
+ * @status: if loop should break on multi command
  * Return: int
  */
 
@@ -154,12 +154,12 @@ int rpath(
 	const char *name,
 	char *const av[],
 	char *const env[],
-	int *should_break)
+	int *status)
 {
 	char *filepath = NULL;
 	size_t i;
 
-	char __attribute__((unused)) * new_argv[1024 * sizeof(char)];
+	char __attribute__((unused))*new_argv[1024 * sizeof(char)];
 	filepath = search_path(av[0]);
 	if (filepath == NULL)
 	{
@@ -188,7 +188,7 @@ int rpath(
 			i++;
 		}
 		new_argv[i] = NULL;
-		execute(new_argv[0], new_argv, env, filepath, should_break);
+		execute(new_argv[0], new_argv, env, filepath, status);
 	}
 	return (0);
 }

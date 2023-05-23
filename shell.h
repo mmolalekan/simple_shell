@@ -19,7 +19,7 @@ int execute(
 	char *const argv[],
 	char *const env[],
 	char *buf,
-	int *should_break);
+	int *status);
 void loop(char **av, char *buffer, ssize_t *nread, char **env);
 
 /* UTILS */
@@ -50,8 +50,11 @@ void run_exec(
 	char **env,
 	char *argv[],
 	char *multi_command[],
-	int has_AND);
+	int has_AND,
+	int *status);
 int check_multi_command(char *buffer, char *multi_command[]);
+void var_replacement(char *variable, int status);
+void print_var(const char *name);
 
 /* MISCELLANEOUS */
 void display_prompt(void);
@@ -67,6 +70,6 @@ int rpath(
 int is_space(int c);
 void trim_space(char *input);
 void rev_string(char *s);
-int check_builtin(char *cmd[], char *buf);
+int check_builtin(char *cmd[], char *buf, int status);
 
 #endif

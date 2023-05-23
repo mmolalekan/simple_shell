@@ -21,3 +21,7 @@ move subsequent item up by one
 check if buffer contains ;
 if yes strtok using ;
 then while arr from string to k is not NULL call execute
+
+var replacement
+if index 0 is echo and index 1 contains $ call var replacement function,
+var replacement function will check through list of special variables and run the corresponding function.
