@@ -1,98 +1,188 @@
 #include "shell.h"
 
 /**
- * check_builtin - Check if command entered is builtin and run function
- *
- * @cmd: user command list
- * @buf: buffer
- * @status: exit status
- * Return: 0 if builtin or -1 if not builtin
+ * _myexit - exits the shell
+ * @info: Structure containing potential arguments.
+ * Return: exit status
+ * (0) if info.argv[0] != "exit"
  */
 
-int check_builtin(char *cmd[], char *buf, int status)
+int _myexit(info_t *info)
 {
-	if (_strcmp(cmd[0], "exit") == 0)
+	int exitcheck;
+
+	if (info->argv[1])
 	{
-		if (!cmd[1])
-		e_exit(EXIT_SUCCESS, buf);
-		else
-		e_exit(atoi(cmd[1]), buf);
+		exitcheck = _erratoi(info->argv[1]);
+		if (exitcheck == -1)
+		{
+			info->status = 2;
+			print_error(info, "Illegal number: ");
+			_eputs(info->argv[1]);
+			_eputchar('\n');
+			return (1);
+		}
+		info->err_num = _erratoi(info->argv[1]);
+		return (-2);
 	}
-	else if (_strcmp(cmd[0], "env") == 0)
-	print_env();
-	else if (_strcmp(cmd[0], "setenv") == 0)
-	_setenv(cmd);
-	else if (_strcmp(cmd[0], "unsetenv") == 0)
-	_unsetenv(cmd);
-	else if (_strcmp(cmd[0], "cd") == 0)
-	cd(cmd[1]);
-	else if (_strcmp(cmd[0], "echo") == 0 && strchr(cmd[1], '$'))
-	var_replacement(cmd[1], status);
+	info->err_num = -1;
+	return (-2);
+}
+
+/**
+ * _mycd - changes the current directory of the process
+ * @info: Structure containing potential arguments. Used to maintain
+ * constant function prototype.
+ * Return: 0
+ */
+
+int _mycd(info_t *info)
+{
+	char *s, *dir, buffer[1024];
+	int chdir_ret;
+
+	s = getcwd(buffer, 1024);
+	if (!s)
+		_puts("No such file or directory\n");
+	if (!info->argv[1])
+	{
+		dir = _getenv(info, "HOME=");
+		if (!dir)
+			chdir_ret = chdir((dir = _getenv(info, "PWD=")) ? dir : "/");
+		else
+			chdir_ret = chdir(dir);
+	}
+	else if (_strcmp(info->argv[1], "-") == 0)
+	{
+		if (!_getenv(info, "OLDPWD="))
+		{
+			_puts(s);
+			_putchar('\n');
+			return (1);
+		}
+		_puts(_getenv(info, "OLDPWD=")), _putchar('\n');
+		chdir_ret = chdir((dir = _getenv(info, "OLDPWD=")) ? dir : "/");
+	}
 	else
-	return (-1);
+		chdir_ret = chdir(info->argv[1]);
+	if (chdir_ret == -1)
+	{
+		print_error(info, "can't cd to ");
+		_eputs(info->argv[1]), _eputchar('\n');
+	}
+	else
+	{
+		_setenv(info, "OLDPWD", _getenv(info, "PWD="));
+		_setenv(info, "PWD", getcwd(buffer, 1024));
+	}
 	return (0);
 }
 
 /**
- * var_replacement - Handle Variable replacement
+ * input_buf - buffers chained commands
+ * @info: parameter struct
+ * @buf: address of buffer
+ * @len: address of len var
  *
- * @variable: variable
- * @status: exit status
+ * Return: bytes read
  */
 
-void var_replacement(char *variable, int status)
+ssize_t input_buf(info_t *info, char **buf, size_t *len)
 {
-	if (_strcmp("$?", variable) == 0)
-	{
-		char status_str[5];
+	ssize_t r = 0;
+	size_t len_p = 0;
 
-		_itoa(status, status_str, 10);
-		write(STDOUT_FILENO, status_str, _strlen(status_str));
-		write(STDOUT_FILENO, "\n", 1);
-	}
-	else if (_strcmp("$$", variable) == 0)
+	if (!*len)
 	{
-		char pid_str[10];
-		pid_t pid = getpid();
+		bfree((void **)info->cmd_buf);
+		free(*buf);
+		*buf = NULL;
+		signal(SIGINT, sigintHandler);
+#if USE_GETLINE
+		r = getline(buf, &len_p, stdin);
+#else
+		r = _getline(info, buf, &len_p);
+#endif
+		if (r > 0)
+		{
+			if ((*buf)[r - 1] == '\n')
+			{
+				(*buf)[r - 1] = '\0';
+				r--;
+			}
 
-		_itoa(pid, pid_str, 10);
-		write(STDOUT_FILENO, pid_str, _strlen(pid_str));
-		write(STDOUT_FILENO, "\n", 1);
+			info->linecount_flag = 1;
+			remove_comments(*buf);
+			build_history_list(info, *buf, info->histcount++);
+
+			if (_strchr(*buf, ';'))
+			{
+				*len = r;
+				info->cmd_buf = buf;
+			}
+		}
 	}
-	else if (_strcmp("$PATH", variable) == 0)
-	{
-		print_var("PATH");
-	}
-	else if (_strcmp("$HOME", variable) == 0)
-	{
-		print_var("HOME");
-	}
-	else if (_strcmp("$PWD", variable) == 0)
-	{
-		print_var("PWD");
-	}
-	else if (_strcmp("$USER", variable) == 0)
-	{
-		print_var("USER");
-	}
-	else if (_strcmp("$LANG", variable) == 0)
-	{
-		print_var("LANG");
-	}
-	else
-	write(STDOUT_FILENO, "", 1);
+	return (r);
 }
 
 /**
- * print_var - print variable
+ * get_input - gets a line minus the newline
+ * @info: parameter struct
  *
- * @name: name of variable
+ * Return: bytes read
  */
 
-void print_var(const char *name)
+ssize_t get_input(info_t *info)
 {
-	char *env_var = _getenv(name);
+	static char *buf;
+	static size_t i, j, len;
+	ssize_t r = 0;
+	char **buf_p = &(info->arg), *p;
 
-	write(STDOUT_FILENO, env_var, _strlen(env_var));
-	write(STDOUT_FILENO, "\n", 1);
+	_putchar(BUF_FLUSH);
+	r = input_buf(info, &buf, &len);
+	if (r == -1)
+		return (-1);
+	if (len)
+	{
+		j = i;
+		p = buf + i;
+		check_chain(info, buf, &j, i, len);
+		while (j < len)
+		{
+			if (is_chain(info, buf, &j))
+				break;
+			j++;
+		}
+		i = j + 1;
+		if (i >= len)
+		{
+			i = len = 0;
+			info->cmd_buf_type = CMD_NORM;
+		}
+		*buf_p = p;
+		return (_strlen(p));
+	}
+	*buf_p = buf;
+	return (r);
+}
+
+/**
+ * read_buf - reads a buffer
+ * @info: parameter struct
+ * @buf: buffer
+ * @i: size
+ * Return: r
+ */
+
+ssize_t read_buf(info_t *info, char *buf, size_t *i)
+{
+	ssize_t r = 0;
+
+	if (*i)
+		return (0);
+	r = read(info->readfd, buf, READ_BUF_SIZE);
+	if (r >= 0)
+		*i = r;
+	return (r);
 }

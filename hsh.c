@@ -1,185 +1,208 @@
 #include "shell.h"
 
 /**
- * display_prompt - displays prompt if in interactive mode
- *
- */
-
-void display_prompt(void)
-{
-	if (isatty(STDIN_FILENO))
-	{
-		write(STDOUT_FILENO, "$ ", 2);
-		fflush(stdout);
-	}
-}
-
-/**
  * main - Interactive shell
  *
  * @ac: argument count
  * @av: Argument list
- * @env: Environment variables
  * Return: int
  */
 
-int main(int ac, char **av, char **env)
+int main(int ac, char **av)
 {
-	char *buffer = NULL;
-	ssize_t nread;
+	info_t info[] = {INFO_INIT};
+	int fd = 2;
 
-	(void)ac;
-	(void)**av;
-	loop(av, buffer, &nread, env);
-	if (nread == -1)
+	asm("mov %1, %0\n\t"
+		"add $3, %0"
+		: "=r"(fd)
+		: "r"(fd));
+	if (ac == 2)
 	{
-		write(STDOUT_FILENO, "", 0);
-	}
-	free(buffer);
-	return (0);
-}
-
-/**
- * loop - the shell loop
- *
- * @av: Argument vector
- * @buffer: Buffer
- * @nread: number of characters read
- * @env: environment variable
- */
-
-void loop(char **av, char *buffer, ssize_t *nread, char **env)
-{
-	char *argv[100], *multi_command[1024];
-	size_t n = 0;
-	int i = 0, has_AND = 0, status = 0;
-
-	buffer = NULL;
-	display_prompt();
-	while ((*nread = getline(&buffer, &n, stdin)) != -1)
-	{
-		if (buffer[0] == '\n')
+		fd = open(av[1], O_RDONLY);
+		if (fd == -1)
 		{
-			free(buffer);
-			buffer = NULL;
-			display_prompt();
-			continue;
-		}
-		for (i = 0; buffer[i]; i++)
-		{
-			if (buffer[i] == '\n')
-				buffer[i] = '\0';
-		}
-
-		has_AND = check_multi_command(buffer, multi_command);
-		run_exec(buffer, av, env, argv, multi_command, has_AND, &status);
-		display_prompt();
-	}
-}
-
-/**
- * run_exec - run execution
- *
- * @buffer: Command buffer
- * @av: argument vector list
- * @env: environment variable list
- * @argv: command array
- * @multi_command: multiple command list
- * @has_AND: check for and variable
- * @status: exit status
- */
-
-void run_exec(
-	char *buffer,
-	char **av,
-	char **env,
-	char *argv[],
-	char *multi_command[],
-	int has_AND,
-	int *status)
-{
-	int i = 0, j = 0;
-	char *token;
-
-	do {
-		i = 0;
-		token = strtok(buffer, " ");
-		while (token != NULL)
-		{
-			argv[i] = token;
-			++i;
-			token = strtok(NULL, " ");
-		}
-		argv[i] = NULL;
-		if (i > 0)
-		{
-			if (execute(av[0], argv, env, buffer, status) == 127 &&
-			!(isatty(STDIN_FILENO)))
+			if (errno == EACCES)
+				exit(126);
+			if (errno == ENOENT)
 			{
+				_eputs(av[0]);
+				_eputs(": 0: Can't open ");
+				_eputs(av[1]);
+				_eputchar('\n');
+				_eputchar(BUF_FLUSH);
 				exit(127);
-				free(buffer);
 			}
+			return (EXIT_FAILURE);
 		}
-		if (*status != 0 && has_AND == 1)
-		{
-			int d;
+		info->readfd = fd;
+	}
+	populate_env_list(info);
+	read_history(info);
+	hsh(info, av);
+	return (EXIT_SUCCESS);
+}
 
-			for (d = 0; multi_command[d]; d++)
-			multi_command[d] = NULL;
+/**
+ * hsh - main shell loop
+ * @info: the parameter & return info struct
+ * @av: the argument vector from main()
+ *
+ * Return: 0 on success, 1 on error, or error code
+ */
+
+int hsh(info_t *info, char **av)
+{
+	ssize_t r = 0;
+	int builtin_ret = 0;
+
+	while (r != -1 && builtin_ret != -2)
+	{
+		clear_info(info);
+		if (interactive(info))
+			_puts("$ ");
+		_eputchar(BUF_FLUSH);
+		r = get_input(info);
+		if (r != -1)
+		{
+			set_info(info, av);
+			builtin_ret = find_builtin(info);
+			if (builtin_ret == -1)
+				find_cmd(info);
+		}
+		else if (interactive(info))
+			_putchar('\n');
+		free_info(info, 0);
+	}
+	write_history(info);
+	free_info(info, 1);
+	if (!interactive(info) && info->status)
+		exit(info->status);
+	if (builtin_ret == -2)
+	{
+		if (info->err_num == -1)
+			exit(info->status);
+		exit(info->err_num);
+	}
+	return (builtin_ret);
+}
+
+/**
+ * find_builtin - finds a builtin command
+ * @info: the parameter & return info struct
+ *
+ * Return: -1 if builtin not found,
+ * 0 if builtin executed successfully,
+ * 1 if builtin found but not successful,
+ * 2 if builtin signals exit()
+ */
+
+int find_builtin(info_t *info)
+{
+	int i, built_in_ret = -1;
+
+	builtin_table builtintbl[] = {
+		{"exit", _myexit},
+		{"env", _myenv},
+		{"help", _myhelp},
+		{"history", _myhistory},
+		{"setenv", _mysetenv},
+		{"unsetenv", _myunsetenv},
+		{"cd", _mycd},
+		{"alias", _myalias},
+		{NULL, NULL}
+	};
+	for (i = 0; builtintbl[i].type; i++)
+	{
+		if (_strcmp(info->argv[0], builtintbl[i].type) == 0)
+		{
+			info->line_count++;
+			built_in_ret = builtintbl[i].func(info);
 			break;
 		}
-		++j;
-		buffer = multi_command[j];
-	} while (multi_command[j] != NULL);
-	for (j = 0; multi_command[j]; j++)
-	multi_command[j] = NULL;
+	}
+	return (built_in_ret);
 }
 
 /**
- * check_multi_command - Check if command is multiple
+ * find_cmd - finds a command in PATH
+ * @info: the parameter & return info struct
  *
- * @buffer: buffer containing user commands
- * @multi_command: array to store multi_commands
- * Return: int
+ * Return: void
  */
 
-int check_multi_command(char *buffer, char *multi_command[])
+void find_cmd(info_t *info)
 {
-	int i = 0;
-	char *linker;
+	char *path = NULL;
+	int i, k;
 
-	if (strchr(buffer, ';'))
+	info->path = info->argv[0];
+	if (info->linecount_flag == 1)
 	{
-		multi_command[i] = strtok(buffer, ";");
-		while (multi_command[i] != NULL)
-		{
-			i++;
-			multi_command[i] = strtok(NULL, ";");
-		}
-		multi_command[i] = NULL;
+		info->line_count++;
+		info->linecount_flag = 0;
 	}
-	linker = _strstr(buffer, "||");
-	if (linker)
+	for (i = 0, k = 0; info->arg[i]; i++)
 	{
-		multi_command[i] = strtok(buffer, "||");
-		while (multi_command[i] != NULL)
-		{
-			i++;
-			multi_command[i] = strtok(NULL, "||");
-		}
-		multi_command[i] = NULL;
+		if (!is_delim(info->arg[i], " \t\n"))
+			k++;
 	}
-	linker = _strstr(buffer, "&&");
-	if (linker)
+	if (!k)
+		return;
+	path = find_path(info, _getenv(info, "PATH="), info->argv[0]);
+	if (path)
 	{
-		multi_command[i] = strtok(buffer, "&&");
-		while (multi_command[i] != NULL)
-		{
-			i++;
-			multi_command[i] = strtok(NULL, "&&");
-		}
-		multi_command[i] = NULL;
-		return (1);
+		info->path = path;
+		fork_cmd(info);
 	}
-	return (0);
+	else
+	{
+		if ((interactive(info) || _getenv(info, "PATH=") || info->argv[0][0] == '/')
+		&& is_cmd(info, info->argv[0]))
+			fork_cmd(info);
+		else if (*(info->arg) != '\n')
+		{
+			info->status = 127;
+			print_error(info, "not found\n");
+		}
+	}
+}
+
+/**
+ * fork_cmd - forks a an exec thread to run cmd
+ * @info: the parameter & return info struct
+ *
+ * Return: void
+ */
+
+void fork_cmd(info_t *info)
+{
+	pid_t child_pid;
+
+	child_pid = fork();
+	if (child_pid == -1)
+	{
+		perror("Error:");
+		return;
+	}
+	if (child_pid == 0)
+	{
+		if (execve(info->path, info->argv, get_environ(info)) == -1)
+		{
+			free_info(info, 1);
+			if (errno == EACCES)
+				exit(126);
+			exit(1);
+		}
+	}
+	else
+	{
+		wait(&(info->status));
+		if (WIFEXITED(info->status))
+		{
+			info->status = WEXITSTATUS(info->status);
+			if (info->status == 126)
+				print_error(info, "Permission denied\n");
+		}
+	}
 }

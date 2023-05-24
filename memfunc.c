@@ -33,7 +33,7 @@ char *_memcpy(char *dest, char *src, unsigned int n)
 void *_memmove(void *dest, const void *src, size_t n)
 {
 	char *dest_ptr = (char *)dest;
-	const char *src_ptr = (const char *) src;
+	const char *src_ptr = (const char *)src;
 	size_t i;
 
 	if (dest_ptr <= src_ptr)
@@ -51,4 +51,70 @@ void *_memmove(void *dest, const void *src, size_t n)
 		}
 	}
 	return (dest);
+}
+
+/**
+ * bfree - frees a pointer and NULLs the address
+ * @ptr: address of the pointer to free
+ *
+ * Return: 1 if freed, otherwise 0.
+ */
+
+int bfree(void **ptr)
+{
+	if (ptr && *ptr)
+	{
+		free(*ptr);
+		*ptr = NULL;
+		return (1);
+	}
+	return (0);
+}
+
+/**
+ * _memset - Fill memory with constant bytes
+ *
+ * @s: Pointer to memory
+ * @b: byte to fill with
+ * @n: number of byte to fill
+ * Return:char*
+ */
+
+char *_memset(char *s, char b, unsigned int n)
+{
+	unsigned int i;
+
+	for (i = 0; i < n; i++)
+	{
+		s[i] = b;
+	}
+	return (s);
+}
+
+/**
+ * _realloc - reallocates a block of memory
+ * @ptr: pointer to previous malloc'ated block
+ * @old_size: byte size of previous block
+ * @new_size: byte size of new block
+ * Return: pointer to the old block name.
+ */
+
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
+{
+	char *p;
+
+	if (!ptr)
+		return (malloc(new_size));
+	if (!new_size)
+		return (free(ptr), NULL);
+	if (new_size == old_size)
+		return (ptr);
+	p = malloc(new_size);
+	if (!p)
+		return (NULL);
+	old_size = old_size < new_size ? old_size : new_size;
+	while (old_size--)
+		p[old_size] = ((char *)ptr)[old_size];
+	free(ptr);
+	return (p);
 }

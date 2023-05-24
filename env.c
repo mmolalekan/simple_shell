@@ -1,126 +1,91 @@
 #include "shell.h"
 
 /**
- * _getenv - retrieves the value of an environment variable
- * @name: the name of the environment variable
- *
- * Return: a pointer to the value of the environment variable,
- * or NULL if the variable is not found
- */
-char *_getenv(const char *name)
-{
-	char *env_value;
-	int len = _strlen(name);
-	char **env = environ;
-
-	while (*env != NULL)
-	{
-		if (_strncmp(*env, name, len) == 0 && (*env)[len] == '=')
-		{
-			env_value = &(*env)[len + 1];
-			break;
-		}
-		env++;
-	}
-	return (env_value);
-}
-
-/**
- * _setenv - Set environment variable
- *
- * @cmd: command list
- * Return: 0 on success and -1 on error
+ * _myenv - prints the current environment
+ * @info: Structure containing potential arguments.
+ * Return: Always 0
  */
 
-int _setenv(char *cmd[])
+int _myenv(info_t *info)
 {
-	int i = 0;
-
-	if (!cmd[1] || !cmd[2])
-	{
-		write(STDERR_FILENO, "Usage: setenv VARIABLE VALUE\n", 30);
-		return (-1);
-	}
-	while (environ[i])
-	{
-		char *linker;
-		size_t num_byte_matched;
-
-		linker = _strchr(environ[i], '=');
-		if (linker == NULL)
-		{
-			return (-1);
-		}
-		num_byte_matched = linker - environ[i];
-		if (_strncmp(environ[i], cmd[1], num_byte_matched) == 0)
-		{
-			_strcpy(linker + 1, cmd[2]);
-			return (0);
-		}
-		i++;
-	}
-	environ[i] = malloc(sizeof(char) * _strlen(cmd[1]) + _strlen(cmd[2]) + 2);
-	if (!environ[i])
-	return (-1);
-	else
-	{
-		_memset(environ[i], 0, _strlen(cmd[1]) + _strlen(cmd[2]) + 2);
-		_strcat(environ[i], cmd[1]);
-		_strcat(environ[i], "=");
-		_strcat(environ[i], cmd[2]);
-	}
-	environ[i + 1] = NULL;
+	print_list_str(info->env);
 	return (0);
 }
 
 /**
- * _unsetenv - delete variable from environ list
+ * _getenv - gets the value of an environ variable
+ * @info: Structure containing potential arguments.
+ * @name: env var name
  *
- * @cmd: command list
- * Return: 0 on success and -1 on error
+ * Return: the value
  */
 
-int _unsetenv(char *cmd[])
+char *_getenv(info_t *info, const char *name)
 {
-	int i = 0;
+	list_t *node = info->env;
+	char *p;
 
-	if (!cmd[1])
+	while (node)
 	{
-		write(STDERR_FILENO, "Usage: unsetenv VARIABLE\n", 26);
-		return (-1);
+		p = starts_with(node->str, name);
+		if (p && *p)
+			return (p);
+		node = node->next;
 	}
-	while (environ[i])
-	{
-		char *linker = strchr(environ[i], '=');
-		size_t n = linker - environ[i];
+	return (NULL);
+}
 
-		if (strncmp(environ[i], cmd[1], n) == 0)
-		{
-			while (environ[i])
-			{
-				environ[i] = environ[i + 1];
-			}
-			return (0);
-		}
-		i++;
+/**
+ * _mysetenv - Modify or add a variable to the env list
+ * @info: Structure containing potential arguments.
+ *  Return: Always 0
+ */
+
+int _mysetenv(info_t *info)
+{
+	if (info->argc != 3)
+	{
+		_eputs("Incorrect number of arguements\n");
+		return (1);
 	}
+	if (_setenv(info, info->argv[1], info->argv[2]))
+		return (0);
+	return (1);
+}
+
+/**
+ * _myunsetenv - Remove an environment variable
+ * @info: Structure containing potential arguments.
+ * Return: Always 0
+ */
+
+int _myunsetenv(info_t *info)
+{
+	int i;
+
+	if (info->argc == 1)
+	{
+		_eputs("Too few arguements.\n");
+		return (1);
+	}
+	for (i = 1; i <= info->argc; i++)
+		_unsetenv(info, info->argv[i]);
 	return (0);
 }
 
-
 /**
- * print_env - print environment
- *
+ * populate_env_list - populates env linked list
+ * @info: Structure containing potential arguments.
+ * Return: Always 0
  */
 
-void print_env(void)
+int populate_env_list(info_t *info)
 {
-	int i = 0;
+	list_t *node = NULL;
+	size_t i;
 
-	while (environ && environ[i])
-	{
-		write(STDOUT_FILENO, environ[i], _strlen(environ[i]));
-		write(STDOUT_FILENO, "\n", 1);
-		i++;
-	}
+	for (i = 0; environ[i]; i++)
+		add_node_end(&node, environ[i], 0);
+	info->env = node;
+	return (0);
 }

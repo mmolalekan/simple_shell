@@ -8,69 +8,79 @@
  */
 int _atoi(char *s)
 {
-int i, d, n, len, f, digit;
+	int i, d, n, len, f, digit;
 
-i = 0;
-d = 0;
-n = 0;
-len = 0;
-f = 0;
-digit = 0;
+	i = 0;
+	d = 0;
+	n = 0;
+	len = 0;
+	f = 0;
+	digit = 0;
 
-while (s[len] != '\0')
-len++;
+	while (s[len] != '\0')
+		len++;
 
-while (i < len && f == 0)
-{
-if (s[i] == '-')
-++d;
+	while (i < len && f == 0)
+	{
+		if (s[i] == '-')
+			++d;
 
-if (s[i] >= '0' && s[i] <= '9')
-{
-digit = s[i] - '0';
-if (d % 2)
-digit = -digit;
-n = n * 10 + digit;
-f = 1;
-if (s[i + 1] < '0' || s[i + 1] > '9')
-break;
-f = 0;
-}
-i++;
-}
+		if (s[i] >= '0' && s[i] <= '9')
+		{
+			digit = s[i] - '0';
+			if (d % 2)
+				digit = -digit;
+			n = n * 10 + digit;
+			f = 1;
+			if (s[i + 1] < '0' || s[i + 1] > '9')
+				break;
+			f = 0;
+		}
+		i++;
+	}
 
-if (f == 0)
-return (0);
-
-return (n);
+	if (f == 0)
+		return (0);
+	return (n);
 }
 
 /**
- * _itoa - convert integer to string
+ * interactive - returns true if shell is interactive mode
+ * @info: struct address
  *
- * @num: Number to convert
- * @str: array to store converted int
- * @radix: Base of conversion
+ * Return: 1 if interactive mode, 0 otherwise
  */
 
-void _itoa(int num, char *str, int radix)
+int interactive(info_t *info)
 {
-	int i = 0;
+	return (isatty(STDIN_FILENO) && info->readfd <= 2);
+}
 
-	if (num == 0)
-	{
-		str[i] = '0';
-		i++;
-		str[i] = '\0';
-	}
-	while (num != 0)
-	{
-		int remainder = num % radix;
+/**
+ * is_delim - checks if character is a delimeter
+ * @c: the char to check
+ * @delim: the delimeter string
+ * Return: 1 if true, 0 if false
+ */
 
-		str[i] = (remainder > 9) ? (remainder - 10) + 'a' : remainder + '0';
-		i++;
-		num /= radix;
-	}
-	str[i] = '\0';
-	rev_string(str);
+int is_delim(char c, char *delim)
+{
+	while (*delim)
+		if (*delim++ == c)
+			return (1);
+	return (0);
+}
+
+/**
+ * _isalpha - checks for alphabetic character
+ * @c: The character to input
+ * Return: 1 if c is alphabetic, 0 otherwise
+ */
+
+int _isalpha(int c)
+{
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+		return (1);
+	else
+		return (0);
 }

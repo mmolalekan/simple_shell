@@ -7,7 +7,7 @@
  * Return: char
  */
 
-char *_strcat(char *dest, char const *src)
+char *_strcat(char *dest, char *src)
 {
 int DESTINATION_LENGTH = 0;
 char *tmp_dest = dest;
@@ -33,7 +33,7 @@ return (tmp_dest);
  * Return: int
  */
 
-int _strlen(char const *s)
+int _strlen(char *s)
 {
 int i = 0;
 while (*(s + i) != '\0')
@@ -91,7 +91,7 @@ return (0);
  * @str: char
  * Return: 0
  */
-char *_strdup(char *str)
+char *_strdup(const char *str)
 {
 	char *aaa;
 	int i, r = 0;
