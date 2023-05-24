@@ -52,16 +52,17 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 {
 	char *argv[100], *multi_command[1024];
 	size_t n = 0;
-	int i = 0, status = 0, has_AND;
+	int i = 0, has_AND = 0, status = 0;
 
+	buffer = NULL;
 	display_prompt();
 	while ((*nread = getline(&buffer, &n, stdin)) != -1)
 	{
 		if (buffer[0] == '\n')
 		{
-			display_prompt();
 			free(buffer);
 			buffer = NULL;
+			display_prompt();
 			continue;
 		}
 		for (i = 0; buffer[i]; i++)
@@ -69,7 +70,7 @@ void loop(char **av, char *buffer, ssize_t *nread, char **env)
 			if (buffer[i] == '\n')
 				buffer[i] = '\0';
 		}
-		i = 0;
+
 		has_AND = check_multi_command(buffer, multi_command);
 		run_exec(buffer, av, env, argv, multi_command, has_AND, &status);
 		display_prompt();
@@ -97,15 +98,17 @@ void run_exec(
 	int has_AND,
 	int *status)
 {
-	int i, j = 0;
+	int i = 0, j = 0;
+	char *token;
 
 	do {
 		i = 0;
-		argv[i] = strtok(buffer, " ");
-		while (argv[i] != NULL)
+		token = strtok(buffer, " ");
+		while (token != NULL)
 		{
+			argv[i] = token;
 			++i;
-			argv[i] = strtok(NULL, " ");
+			token = strtok(NULL, " ");
 		}
 		argv[i] = NULL;
 		if (i > 0)
@@ -126,7 +129,6 @@ void run_exec(
 			break;
 		}
 		++j;
-		buffer = NULL;
 		buffer = multi_command[j];
 	} while (multi_command[j] != NULL);
 	for (j = 0; multi_command[j]; j++)
@@ -155,7 +157,6 @@ int check_multi_command(char *buffer, char *multi_command[])
 			multi_command[i] = strtok(NULL, ";");
 		}
 		multi_command[i] = NULL;
-		return (0);
 	}
 	linker = _strstr(buffer, "||");
 	if (linker)
@@ -167,7 +168,6 @@ int check_multi_command(char *buffer, char *multi_command[])
 			multi_command[i] = strtok(NULL, "||");
 		}
 		multi_command[i] = NULL;
-		return (0);
 	}
 	linker = _strstr(buffer, "&&");
 	if (linker)
