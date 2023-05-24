@@ -1,56 +1,13 @@
 #include "shell.h"
 
 /**
- * main - Interactive shell
- *
- * @ac: argument count
- * @av: Argument list
- * Return: int
- */
-
-int main(int ac, char **av)
-{
-	info_t info[] = {INFO_INIT};
-	int fd = 2;
-
-	asm("mov %1, %0\n\t"
-		"add $3, %0"
-		: "=r"(fd)
-		: "r"(fd));
-	if (ac == 2)
-	{
-		fd = open(av[1], O_RDONLY);
-		if (fd == -1)
-		{
-			if (errno == EACCES)
-				exit(126);
-			if (errno == ENOENT)
-			{
-				_eputs(av[0]);
-				_eputs(": 0: Can't open ");
-				_eputs(av[1]);
-				_eputchar('\n');
-				_eputchar(BUF_FLUSH);
-				exit(127);
-			}
-			return (EXIT_FAILURE);
-		}
-		info->readfd = fd;
-	}
-	populate_env_list(info);
-	read_history(info);
-	hsh(info, av);
-	return (EXIT_SUCCESS);
-}
-
-/**
  * hsh - main shell loop
  * @info: the parameter & return info struct
  * @av: the argument vector from main()
+ * okhai and kenny project.
  *
  * Return: 0 on success, 1 on error, or error code
  */
-
 int hsh(info_t *info, char **av)
 {
 	ssize_t r = 0;
@@ -92,11 +49,10 @@ int hsh(info_t *info, char **av)
  * @info: the parameter & return info struct
  *
  * Return: -1 if builtin not found,
- * 0 if builtin executed successfully,
- * 1 if builtin found but not successful,
- * 2 if builtin signals exit()
+ *			0 if builtin executed successfully,
+ *			1 if builtin found but not successful,
+ *			-2 if builtin signals exit()
  */
-
 int find_builtin(info_t *info)
 {
 	int i, built_in_ret = -1;
@@ -112,15 +68,14 @@ int find_builtin(info_t *info)
 		{"alias", _myalias},
 		{NULL, NULL}
 	};
+
 	for (i = 0; builtintbl[i].type; i++)
-	{
 		if (_strcmp(info->argv[0], builtintbl[i].type) == 0)
 		{
 			info->line_count++;
 			built_in_ret = builtintbl[i].func(info);
 			break;
 		}
-	}
 	return (built_in_ret);
 }
 
@@ -130,7 +85,6 @@ int find_builtin(info_t *info)
  *
  * Return: void
  */
-
 void find_cmd(info_t *info)
 {
 	char *path = NULL;
@@ -143,12 +97,11 @@ void find_cmd(info_t *info)
 		info->linecount_flag = 0;
 	}
 	for (i = 0, k = 0; info->arg[i]; i++)
-	{
 		if (!is_delim(info->arg[i], " \t\n"))
 			k++;
-	}
 	if (!k)
 		return;
+
 	path = find_path(info, _getenv(info, "PATH="), info->argv[0]);
 	if (path)
 	{
@@ -157,8 +110,8 @@ void find_cmd(info_t *info)
 	}
 	else
 	{
-		if ((interactive(info) || _getenv(info, "PATH=") || info->argv[0][0] == '/')
-		&& is_cmd(info, info->argv[0]))
+		if ((interactive(info) || _getenv(info, "PATH=")
+			|| info->argv[0][0] == '/') && is_cmd(info, info->argv[0]))
 			fork_cmd(info);
 		else if (*(info->arg) != '\n')
 		{
@@ -174,7 +127,6 @@ void find_cmd(info_t *info)
  *
  * Return: void
  */
-
 void fork_cmd(info_t *info)
 {
 	pid_t child_pid;
@@ -182,6 +134,7 @@ void fork_cmd(info_t *info)
 	child_pid = fork();
 	if (child_pid == -1)
 	{
+		/* TODO: PUT ERROR FUNCTION */
 		perror("Error:");
 		return;
 	}
@@ -194,6 +147,7 @@ void fork_cmd(info_t *info)
 				exit(126);
 			exit(1);
 		}
+		/* TODO: PUT ERROR FUNCTION */
 	}
 	else
 	{

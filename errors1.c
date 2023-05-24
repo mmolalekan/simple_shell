@@ -1,35 +1,53 @@
 #include "shell.h"
-
 /**
- * _putchar - Print character to console
- *
- * @c: Character to print
- * Return: int
+ * _erratoi - converts a string to an integer
+ * @s: the string to be converted
+ * Return: 0 if no numbers in string,  converted number otherwise
+ * -1 on error
  */
-
-int _putchar(char c)
+int _erratoi(char *s)
 {
-	static int i;
-	static char buf[WRITE_BUF_SIZE];
+	int i = 0;
+	unsigned long int result = 0;
 
-	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+	if (*s == '+')
+		s++;
+	for (i = 0; s[i] != '\0'; i++)
 	{
-		write(1, buf, i);
-		i = 0;
+		if (s[i] >= '0' && s[i] <= '9')
+		{
+			result *= 10;
+			result += (s[i] - '0');
+			if (result > INT_MAX)
+				return (-1);
+		}
+		else
+			return (-1);
 	}
-	if (c != BUF_FLUSH)
-		buf[i++] = c;
-	return (1);
+	return (result);
 }
-
+/**
+ * print_error - prints an error message
+ * @info: the parameter & return info struct
+ * @estr: string containing specified error type
+ * Return: 0 if no number in string, converted number otherwise -1 on error
+ */
+void print_error(info_t *info, char *estr)
+{
+	_eputs(info->fname);
+	_eputs(": ");
+	print_d(info->line_count, STDERR_FILENO);
+	_eputs(": ");
+	_eputs(info->argv[0]);
+	_eputs(": ");
+	_eputs(estr);
+}
 /**
  * print_d - function prints a decimal (integer) number (base 10)
  * @input: the input
  * @fd: the filedescriptor to write to
- *
- * Return: number of characters printed
+ * Return: number of character printed
  */
-
 int print_d(int input, int fd)
 {
 	int (*__putchar)(char) = _putchar;
@@ -60,7 +78,6 @@ int print_d(int input, int fd)
 	count++;
 	return (count);
 }
-
 /**
  * convert_number - converter function, a clone of itoa
  * @num: number
@@ -68,7 +85,6 @@ int print_d(int input, int fd)
  * @flags: argument flags
  * Return: string
  */
-
 char *convert_number(long int num, int base, int flags)
 {
 	static char *array;
@@ -93,14 +109,11 @@ char *convert_number(long int num, int base, int flags)
 		*--ptr = sign;
 	return (ptr);
 }
-
 /**
- * remove_comments - remove comments
+ * remove_comments - function replaces first instance of '#' with '\0'
  * @buf: address of the string to modify
- *
  * Return: Always 0;
  */
-
 void remove_comments(char *buf)
 {
 	int i;
@@ -111,25 +124,4 @@ void remove_comments(char *buf)
 			buf[i] = '\0';
 			break;
 		}
-}
-
-/**
- * _putsfd - prints an input string
- * @str: the string to be printed
- * @fd: the filedescriptor to write to
- *
- * Return: the number of chars put
- */
-
-int _putsfd(char *str, int fd)
-{
-	int i = 0;
-
-	if (!str)
-		return (0);
-	while (*str)
-	{
-		i += _putfd(*str++, fd);
-	}
-	return (i);
 }
