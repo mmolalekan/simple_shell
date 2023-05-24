@@ -99,6 +99,7 @@ int replace_string(char **old, char *new)
 int _myhelp(info_t *info)
 {
 	char **arg_array;
+
 	arg_array = info->argv;
 	_puts("help call works. Function not yet implemented \n");
 	if (0)
