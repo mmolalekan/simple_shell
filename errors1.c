@@ -1,93 +1,71 @@
 #include "shell.h"
-/**
- * _erratoi - converts a string to an integer
- * @s: the string to be converted
- * Return: 0 if no numbers in string,  converted number otherwise
- * -1 on error
- */
-int _erratoi(char *s)
-{
-	int i = 0;
-	unsigned long int result = 0;
 
-	if (*s == '+')
-		s++;
-	for (i = 0; s[i] != '\0'; i++)
-	{
-		if (s[i] >= '0' && s[i] <= '9')
-		{
-			result *= 10;
-			result += (s[i] - '0');
-			if (result > INT_MAX)
-				return (-1);
-		}
-		else
-			return (-1);
-	}
-	return (result);
-}
 /**
- * print_error - prints an error message
- * @info: the parameter & return info struct
- * @estr: string containing specified error type
- * Return: 0 if no number in string, converted number otherwise -1 on error
+ * print_err - prints an error message
+ * @info: arguments struct
+ * @estr: error msg
  */
-void print_error(info_t *info, char *estr)
+
+void print_err(data_t *info, char *estr)
 {
-	_eputs(info->fname);
-	_eputs(": ");
-	print_d(info->line_count, STDERR_FILENO);
-	_eputs(": ");
-	_eputs(info->argv[0]);
-	_eputs(": ");
-	_eputs(estr);
+	_errputs(info->filename);
+	_errputs(": ");
+	print_int(info->line_count, STDERR_FILENO);
+	_errputs(": ");
+	_errputs(info->argv[0]);
+	_errputs(": ");
+	_errputs(estr);
 }
+
 /**
- * print_d - function prints a decimal (integer) number (base 10)
- * @input: the input
- * @fd: the filedescriptor to write to
- * Return: number of character printed
+ * print_int - function prints a decimal number
+ * @input: input
+ * @fd: file descriptor
+ * Return: number of printed character
  */
-int print_d(int input, int fd)
+
+int print_int(int input, int fd)
 {
-	int (*__putchar)(char) = _putchar;
+	int (*__putc)(char) = _putchar;
 	int i, count = 0;
-	unsigned int _abs_, current;
+	unsigned int _absolute_, current;
 
 	if (fd == STDERR_FILENO)
-		__putchar = _eputchar;
+		__putc = _errputchar;
 	if (input < 0)
 	{
-		_abs_ = -input;
-		__putchar('-');
+		_absolute_ = -input;
+		__putc('-');
 		count++;
 	}
 	else
-		_abs_ = input;
-	current = _abs_;
-	for (i = 1000000000; i > 1; i /= 10)
+		_absolute_ = input;
+	current = _absolute_;
+	i = 1000000000;
+	while (i > 1)
 	{
-		if (_abs_ / i)
+		if (_absolute_ / i)
 		{
-			__putchar('0' + current / i);
+			__putc('0' + current / i);
 			count++;
 		}
 		current %= i;
+		i /= 10;
 	}
-	__putchar('0' + current);
+	__putc('0' + current);
 	count++;
 	return (count);
 }
 /**
- * convert_number - converter function, a clone of itoa
+ * convert_number - converts int to string
  * @num: number
  * @base: base
- * @flags: argument flags
- * Return: string
+ * @flags: flags
+ * Return: pointer to string
  */
 char *convert_number(long int num, int base, int flags)
 {
-	static char *array;
+	static char *num_str;
 	static char buffer[50];
 	char sign = 0;
 	char *ptr;
@@ -98,30 +76,52 @@ char *convert_number(long int num, int base, int flags)
 		n = -num;
 		sign = '-';
 	}
-	array = flags & CONVERT_LOWERCASE ? "0123456789abcdef" : "0123456789ABCDEF";
+	num_str = flags & CONVERT_LOWERCASE ? "0123456789abcdef" : "0123456789ABCDEF";
 	ptr = &buffer[49];
 	*ptr = '\0';
 	do {
-		*--ptr = array[n % base];
+		*--ptr = num_str[n % base];
 		n /= base;
 	} while (n != 0);
 	if (sign)
 		*--ptr = sign;
 	return (ptr);
 }
-/**
- * remove_comments - function replaces first instance of '#' with '\0'
- * @buf: address of the string to modify
- * Return: Always 0;
- */
-void remove_comments(char *buf)
-{
-	int i;
 
-	for (i = 0; buf[i] != '\0'; i++)
-		if (buf[i] == '#' && (!i || buf[i - 1] == ' '))
+/**
+ * comment_handler - function replaces first instance of '#' with '\0'
+ * @buffer: address of the string to modify
+ * Return: 0;
+ */
+
+void comment_handler(char *buffer)
+{
+	int i = 0;
+
+	for (i = 0; buffer[i] != '\0'; i++)
+	{
+		if (buffer[i] == '#' && (!i || buffer[i - 1] == ' '))
 		{
-			buf[i] = '\0';
+			buffer[i] = '\0';
 			break;
 		}
+	}
+}
+
+/**
+ * free_buff - free a pointer
+ * @ptr: pointer to memory address to be freed
+ *
+ * Return: 1 on success, 0 on error.
+ */
+
+int free_buff(void **ptr)
+{
+	if (ptr && *ptr)
+	{
+		free(*ptr);
+		*ptr = NULL;
+		return (1);
+	}
+	return (0);
 }

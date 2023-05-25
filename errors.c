@@ -1,10 +1,12 @@
 #include "shell.h"
+
 /**
- * _eputs - prints an output string
+ * _errputs - prints an output string
  * @str: the string to be printed
  * Return: Nothing
  */
-void _eputs(char *str)
+
+void _errputs(char *str)
 {
 	int i = 0;
 
@@ -12,66 +14,97 @@ void _eputs(char *str)
 		return;
 	while (str[i] != '\0')
 	{
-		_eputchar(str[i]);
+		_errputchar(str[i]);
 		i++;
 	}
 }
 /**
- * _eputchar - writes the character  c to stderr
- * @c: the character to print
+ * _errputchar - writes the character  ch to stderr
+ * @ch: the character to print
  * Return: On success 1
  * on error, -1 is returned, and errno is set appropriately
  */
-int _eputchar(char c)
+int _errputchar(char ch)
 {
 	static int i;
-	static char buf[WRITE_BUF_SIZE];
+	static char buffer[WRITE_BUFF_SIZE];
 
-	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+	if (ch == BUFF_FLUSH || i >= WRITE_BUFF_SIZE)
 	{
-		write(2, buf, i);
+		write(2, buffer, i);
 		i = 0;
 	}
-	if (c != BUF_FLUSH)
-		buf[i++] = c;
+	if (ch != BUFF_FLUSH)
+		buffer[i++] = ch;
 	return (1);
 }
+
 /**
- * _putfd - writes the character c to given fd
- * @c: the character to print
- * @fd: the filedescriptor to write to
- * Return: on success 1.
- * on error, -1 is returned, and errno is set appropriately
+ * _putcfd - writes the character ch to given fd
+ * @ch: character
+ * @fd: file descriptor
+ * Return: on success 1, on error -1 is returned, errno is set appropriately
  */
-int _putfd(char c, int fd)
+
+int _putcfd(char ch, int fd)
 {
 	static int i;
-	static char buf[WRITE_BUF_SIZE];
+	static char buffer[WRITE_BUFF_SIZE];
 
-	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+	if (ch == BUFF_FLUSH || i >= WRITE_BUFF_SIZE)
 	{
-		write(fd, buf, i);
+		write(fd, buffer, i);
 		i = 0;
 	}
-	if (c != BUF_FLUSH)
-		buf[i++] = c;
+	if (ch != BUFF_FLUSH)
+		buffer[i++] = ch;
 	return (1);
 }
+
 /**
  * _putsfd - prints an input string
- * @str: the string to be printed
- * @fd: the filedescriptor
- * Return: the number of chars put
+ * @str: string to be printed
+ * @fd: file descriptor
+ * Return: no of char printed
  */
+
 int _putsfd(char *str, int fd)
 {
-	int i = 0;
+	int i;
 
 	if (!str)
 		return (0);
 	while (*str)
 	{
-		i += _putfd(*str++, fd);
+		i += _putcfd(*str++, fd);
 	}
 	return (i);
+}
+
+/**
+ * _erratoi - converts a string to an integer
+ * @s: string
+ * Return: 0 if no numbers in string, converted int or -1 on error
+ */
+
+int _erratoi(char *s)
+{
+	int i = 0;
+	unsigned long int result = 0;
+
+	if (*s == '+')
+		s++;
+	for (i = 0; s[i] != '\0'; i++)
+	{
+		if (s[i] >= '0' && s[i] <= '9')
+		{
+			result *= 10;
+			result += (s[i] - '0');
+			if (result > INT_MAX)
+				return (-1);
+		}
+		else
+			return (-1);
+	}
+	return (result);
 }
